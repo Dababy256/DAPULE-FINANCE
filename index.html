@@ -1,379 +1,2183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MedCentre Enterprise X</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tali Medicals – Hospital Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       TALI MEDICALS — DESIGN TOKENS
+       ✏️  CUSTOMISE: Change colours, fonts, or spacing here.
+       ============================================================ */
+    :root {
+      --brand-primary:   #1A6BB5;   /* Main blue  */
+      --brand-dark:      #0D3F6E;   /* Deep navy  */
+      --brand-light:     #E8F2FC;   /* Pale blue  */
+      --brand-accent:    #2ABFBF;   /* Teal accent */
+      --success:         #22C55E;
+      --warning:         #F59E0B;
+      --danger:          #EF4444;
+      --neutral-50:      #F8FAFC;
+      --neutral-100:     #F1F5F9;
+      --neutral-200:     #E2E8F0;
+      --neutral-300:     #CBD5E1;
+      --neutral-500:     #64748B;
+      --neutral-700:     #334155;
+      --neutral-900:     #0F172A;
+      --sidebar-w:       260px;
+      --topbar-h:        64px;
+      --radius:          12px;
+      --radius-sm:       8px;
+      --shadow:          0 4px 24px rgba(26,107,181,.10);
+      --shadow-sm:       0 2px 8px rgba(0,0,0,.06);
+      --font-body:       'DM Sans', sans-serif;
+      --font-display:    'DM Serif Display', serif;
+      --transition:      .2s cubic-bezier(.4,0,.2,1);
 
-<style>
-:root{
---primary:#0f172a;
---accent:#2563eb;
---success:#16a34a;
---danger:#dc2626;
---warning:#d97706;
---bg:#f1f5f9;
---card:#ffffff;
-}
-*{box-sizing:border-box;}
-body{
-margin:0;
-font-family:Segoe UI, sans-serif;
-background:var(--bg);
-display:flex;
-height:100vh;
-}
-.sidebar{
-width:260px;
-background:var(--primary);
-color:white;
-padding:20px;
-overflow-y:auto;
-}
-.sidebar h2{margin-top:0;}
-.sidebar li{
-list-style:none;
-padding:10px;
-cursor:pointer;
-border-radius:6px;
-}
-.sidebar li:hover{background:#1e293b;}
-.main{
-flex:1;
-padding:20px;
-overflow-y:auto;
-}
-.card{
-background:var(--card);
-padding:20px;
-margin-bottom:20px;
-border-radius:10px;
-box-shadow:0 4px 12px rgba(0,0,0,0.08);
-}
-button{
-padding:8px 12px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-background:var(--accent);
-color:white;
-}
-button.success{background:var(--success);}
-button.danger{background:var(--danger);}
-button.warning{background:var(--warning);}
-input,select,textarea{
-padding:8px;
-width:100%;
-margin:6px 0;
-}
-table{
-width:100%;
-border-collapse:collapse;
-}
-th,td{
-padding:8px;
-border-bottom:1px solid #ddd;
-text-align:left;
-}
-.badge{
-padding:4px 8px;
-border-radius:4px;
-font-size:12px;
-color:white;
-}
-.status-pending{background:var(--warning);}
-.status-complete{background:var(--success);}
-.low-stock{color:var(--danger);font-weight:bold;}
-.topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
-}
-select{
-background:white;
-}
-</style>
+      /* ============================================================
+         ✏️  FACILITY INFO — Change these to match your clinic
+         ============================================================ */
+      --facility-name:   "Tali Medicals";
+      --facility-tagline:"Compassionate Care, Professional Excellence";
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+    html { font-size:15px; }
+    body {
+      font-family: var(--font-body);
+      background: var(--neutral-50);
+      color: var(--neutral-900);
+      min-height: 100vh;
+    }
+
+    /* ── SCROLLBAR ─────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width:6px; height:6px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--neutral-300); border-radius:99px; }
+
+    /* ── AUTH SCREEN ────────────────────────────────────────────── */
+    #auth-screen {
+      display:flex; align-items:center; justify-content:center;
+      min-height:100vh;
+      background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-primary) 60%, var(--brand-accent) 100%);
+      position:relative; overflow:hidden;
+    }
+    #auth-screen::before {
+      content:''; position:absolute; inset:0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .auth-card {
+      background:#fff; border-radius:20px;
+      padding:48px 40px; width:100%; max-width:440px;
+      box-shadow:0 24px 80px rgba(0,0,0,.25);
+      position:relative; z-index:1;
+      animation: slideUp .4s ease;
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .auth-logo {
+      text-align:center; margin-bottom:32px;
+    }
+    .auth-logo .logo-icon {
+      width:64px; height:64px; border-radius:16px;
+      background:linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size:28px; margin-bottom:12px;
+    }
+    .auth-logo h1 {
+      font-family:var(--font-display); font-size:1.8rem;
+      color:var(--brand-dark); line-height:1;
+    }
+    .auth-logo p {
+      font-size:.8rem; color:var(--neutral-500); margin-top:4px;
+    }
+    .form-group { margin-bottom:20px; }
+    .form-group label {
+      display:block; font-size:.8rem; font-weight:600;
+      color:var(--neutral-700); margin-bottom:6px; letter-spacing:.02em;
+      text-transform:uppercase;
+    }
+    .form-control {
+      width:100%; padding:12px 16px; border-radius:var(--radius-sm);
+      border:1.5px solid var(--neutral-200);
+      font-family:var(--font-body); font-size:.95rem;
+      color:var(--neutral-900); background:#fff;
+      transition:border-color var(--transition), box-shadow var(--transition);
+      outline:none;
+    }
+    .form-control:focus {
+      border-color:var(--brand-primary);
+      box-shadow:0 0 0 3px rgba(26,107,181,.12);
+    }
+    select.form-control { cursor:pointer; }
+    .btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:11px 20px; border-radius:var(--radius-sm);
+      font-family:var(--font-body); font-size:.9rem; font-weight:600;
+      cursor:pointer; border:none; transition:all var(--transition);
+      text-decoration:none; white-space:nowrap;
+    }
+    .btn-primary {
+      background:var(--brand-primary); color:#fff;
+    }
+    .btn-primary:hover { background:var(--brand-dark); transform:translateY(-1px); box-shadow:0 4px 16px rgba(26,107,181,.3); }
+    .btn-secondary { background:var(--neutral-100); color:var(--neutral-700); }
+    .btn-secondary:hover { background:var(--neutral-200); }
+    .btn-success { background:var(--success); color:#fff; }
+    .btn-success:hover { filter:brightness(.92); }
+    .btn-danger { background:var(--danger); color:#fff; }
+    .btn-danger:hover { filter:brightness(.92); }
+    .btn-warning { background:var(--warning); color:#fff; }
+    .btn-sm { padding:7px 14px; font-size:.82rem; }
+    .btn-block { width:100%; justify-content:center; padding:14px; font-size:1rem; }
+    .btn-outline {
+      background:transparent; border:1.5px solid var(--brand-primary);
+      color:var(--brand-primary);
+    }
+    .btn-outline:hover { background:var(--brand-light); }
+
+    /* ── APP SHELL ──────────────────────────────────────────────── */
+    #app { display:none; }
+    #app.active { display:flex; min-height:100vh; }
+
+    /* ── SIDEBAR ────────────────────────────────────────────────── */
+    .sidebar {
+      width:var(--sidebar-w); background:var(--brand-dark);
+      display:flex; flex-direction:column;
+      position:fixed; top:0; left:0; bottom:0; z-index:100;
+      transition:transform var(--transition);
+      overflow-y:auto; overflow-x:hidden;
+    }
+    .sidebar-header {
+      padding:24px 20px 20px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-logo {
+      display:flex; align-items:center; gap:12px;
+    }
+    .sidebar-logo .s-icon {
+      width:40px; height:40px; border-radius:10px;
+      background:linear-gradient(135deg,var(--brand-primary),var(--brand-accent));
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; flex-shrink:0;
+    }
+    .sidebar-logo h2 {
+      font-family:var(--font-display); font-size:1.1rem;
+      color:#fff; line-height:1.1;
+    }
+    .sidebar-logo span {
+      font-size:.7rem; color:rgba(255,255,255,.5);
+      font-family:var(--font-body); font-weight:400;
+    }
+    .sidebar-user {
+      padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-user p { font-size:.7rem; color:rgba(255,255,255,.4); margin-bottom:4px; text-transform:uppercase; letter-spacing:.06em; }
+    .sidebar-user strong { font-size:.9rem; color:#fff; display:block; }
+    .sidebar-user em { font-size:.78rem; color:var(--brand-accent); font-style:normal; }
+
+    .nav-section { padding:16px 12px 8px; }
+    .nav-section-label {
+      font-size:.65rem; font-weight:700; letter-spacing:.1em;
+      text-transform:uppercase; color:rgba(255,255,255,.3);
+      padding:0 8px; margin-bottom:6px;
+    }
+    .nav-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:var(--radius-sm);
+      color:rgba(255,255,255,.65); font-size:.88rem; font-weight:500;
+      cursor:pointer; transition:all var(--transition); margin-bottom:2px;
+    }
+    .nav-item:hover { background:rgba(255,255,255,.08); color:#fff; }
+    .nav-item.active { background:var(--brand-primary); color:#fff; }
+    .nav-item .nav-icon { font-size:16px; width:20px; text-align:center; flex-shrink:0; }
+    .sidebar-footer {
+      margin-top:auto; padding:16px 12px;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-footer .nav-item { color:rgba(255,255,255,.5); }
+
+    /* ── MAIN AREA ─────────────────────────────────────────────── */
+    .main-area {
+      margin-left:var(--sidebar-w);
+      flex:1; display:flex; flex-direction:column;
+      min-width:0;
+    }
+    .topbar {
+      height:var(--topbar-h); background:#fff;
+      border-bottom:1px solid var(--neutral-200);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 28px; position:sticky; top:0; z-index:50;
+      box-shadow:var(--shadow-sm);
+    }
+    .topbar-left h3 {
+      font-size:1.1rem; font-weight:600; color:var(--neutral-900);
+    }
+    .topbar-left p { font-size:.78rem; color:var(--neutral-500); }
+    .topbar-right { display:flex; align-items:center; gap:12px; }
+    .topbar-badge {
+      background:var(--brand-light); color:var(--brand-primary);
+      border-radius:99px; padding:4px 12px; font-size:.78rem; font-weight:600;
+    }
+    .logout-btn {
+      padding:8px 16px; border-radius:var(--radius-sm);
+      background:transparent; border:1.5px solid var(--neutral-200);
+      font-family:var(--font-body); font-size:.82rem; font-weight:600;
+      color:var(--neutral-700); cursor:pointer;
+      transition:all var(--transition);
+    }
+    .logout-btn:hover { border-color:var(--danger); color:var(--danger); }
+
+    .page-content { padding:28px; flex:1; }
+
+    /* ── PAGES ─────────────────────────────────────────────────── */
+    .page { display:none; animation:fadeIn .25s ease; }
+    .page.active { display:block; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+    /* ── STATS GRID ─────────────────────────────────────────────── */
+    .stats-grid {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+      gap:16px; margin-bottom:28px;
+    }
+    .stat-card {
+      background:#fff; border-radius:var(--radius);
+      padding:20px 20px 16px;
+      border:1px solid var(--neutral-200);
+      display:flex; flex-direction:column; gap:8px;
+      transition:box-shadow var(--transition), transform var(--transition);
+    }
+    .stat-card:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
+    .stat-card .stat-icon {
+      width:40px; height:40px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; flex-shrink:0;
+    }
+    .stat-card .stat-label { font-size:.75rem; color:var(--neutral-500); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+    .stat-card .stat-value { font-size:1.8rem; font-weight:700; color:var(--neutral-900); line-height:1; }
+    .stat-card .stat-sub { font-size:.75rem; color:var(--neutral-500); }
+    .bg-blue { background:var(--brand-light); color:var(--brand-primary); }
+    .bg-green { background:#DCFCE7; color:#16A34A; }
+    .bg-orange { background:#FEF3C7; color:#D97706; }
+    .bg-red { background:#FEE2E2; color:#DC2626; }
+    .bg-purple { background:#F3E8FF; color:#9333EA; }
+    .bg-teal { background:#CCFBF1; color:#0D9488; }
+    .bg-pink { background:#FCE7F3; color:#DB2777; }
+    .bg-indigo { background:#E0E7FF; color:#4F46E5; }
+
+    /* ── CARDS & PANELS ────────────────────────────────────────── */
+    .card {
+      background:#fff; border-radius:var(--radius);
+      border:1px solid var(--neutral-200); margin-bottom:20px;
+    }
+    .card-header {
+      padding:16px 20px; border-bottom:1px solid var(--neutral-200);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .card-header h4 { font-size:.95rem; font-weight:700; color:var(--neutral-900); }
+    .card-body { padding:20px; }
+
+    /* ── TABLES ────────────────────────────────────────────────── */
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; }
+    thead th {
+      font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+      color:var(--neutral-500); padding:10px 14px; text-align:left;
+      background:var(--neutral-50); border-bottom:1px solid var(--neutral-200);
+    }
+    tbody td {
+      padding:12px 14px; border-bottom:1px solid var(--neutral-100);
+      font-size:.88rem; color:var(--neutral-700); vertical-align:middle;
+    }
+    tbody tr:hover td { background:var(--neutral-50); }
+    tbody tr:last-child td { border-bottom:none; }
+    .td-actions { display:flex; gap:6px; flex-wrap:wrap; }
+
+    /* ── BADGES ────────────────────────────────────────────────── */
+    .badge {
+      display:inline-block; padding:3px 10px; border-radius:99px;
+      font-size:.72rem; font-weight:700; letter-spacing:.02em;
+    }
+    .badge-success { background:#DCFCE7; color:#16A34A; }
+    .badge-warning { background:#FEF3C7; color:#D97706; }
+    .badge-danger  { background:#FEE2E2; color:#DC2626; }
+    .badge-info    { background:var(--brand-light); color:var(--brand-primary); }
+    .badge-neutral { background:var(--neutral-100); color:var(--neutral-500); }
+
+    /* ── MODAL ─────────────────────────────────────────────────── */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; z-index:200;
+      background:rgba(0,0,0,.45); backdrop-filter:blur(2px);
+      align-items:center; justify-content:center; padding:16px;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal {
+      background:#fff; border-radius:var(--radius); width:100%; max-width:540px;
+      max-height:90vh; overflow-y:auto;
+      box-shadow:0 24px 80px rgba(0,0,0,.2);
+      animation:slideUp .25s ease;
+    }
+    .modal-lg { max-width:720px; }
+    .modal-header {
+      padding:20px 24px; border-bottom:1px solid var(--neutral-200);
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .modal-header h3 { font-size:1rem; font-weight:700; }
+    .modal-close {
+      width:32px; height:32px; border-radius:50%; border:none;
+      background:var(--neutral-100); color:var(--neutral-500);
+      font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:background var(--transition);
+    }
+    .modal-close:hover { background:var(--neutral-200); }
+    .modal-body { padding:24px; }
+    .modal-footer {
+      padding:16px 24px; border-top:1px solid var(--neutral-200);
+      display:flex; justify-content:flex-end; gap:10px;
+    }
+
+    /* ── FORM GRID ─────────────────────────────────────────────── */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .form-grid .full { grid-column:1/-1; }
+    textarea.form-control { min-height:90px; resize:vertical; }
+    .form-help { font-size:.75rem; color:var(--neutral-500); margin-top:4px; }
+
+    /* ── TOAST NOTIFICATION ─────────────────────────────────────── */
+    #toast {
+      position:fixed; bottom:24px; right:24px; z-index:999;
+      background:var(--neutral-900); color:#fff;
+      padding:14px 20px; border-radius:var(--radius-sm);
+      font-size:.88rem; font-weight:500;
+      box-shadow:0 8px 32px rgba(0,0,0,.25);
+      transform:translateY(80px); opacity:0;
+      transition:all .3s cubic-bezier(.4,0,.2,1);
+      max-width:340px; display:flex; align-items:center; gap:10px;
+    }
+    #toast.show { transform:translateY(0); opacity:1; }
+    #toast.toast-success { background:#166534; }
+    #toast.toast-error   { background:#991B1B; }
+
+    /* ── SEARCH BAR ─────────────────────────────────────────────── */
+    .search-bar {
+      display:flex; gap:10px; align-items:center; margin-bottom:16px;
+    }
+    .search-input {
+      flex:1; max-width:320px; padding:9px 14px;
+      border:1.5px solid var(--neutral-200); border-radius:var(--radius-sm);
+      font-family:var(--font-body); font-size:.88rem;
+      transition:border-color var(--transition);
+    }
+    .search-input:focus { outline:none; border-color:var(--brand-primary); }
+
+    /* ── NOTICE BOARD ───────────────────────────────────────────── */
+    .notice-item {
+      padding:14px 16px; border-radius:var(--radius-sm);
+      border-left:3px solid var(--brand-primary);
+      background:var(--brand-light); margin-bottom:10px;
+    }
+    .notice-item h5 { font-size:.88rem; font-weight:700; color:var(--brand-dark); }
+    .notice-item p  { font-size:.82rem; color:var(--neutral-700); margin-top:4px; }
+    .notice-item span { font-size:.72rem; color:var(--neutral-500); }
+
+    /* ── PRINT INVOICE ──────────────────────────────────────────── */
+    .invoice-print { padding:24px; }
+    .invoice-print h2 { font-family:var(--font-display); color:var(--brand-dark); }
+
+    /* ── SECTION PAGE HEADER ──────────────────────────────────── */
+    .page-header {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      margin-bottom:24px; gap:16px; flex-wrap:wrap;
+    }
+    .page-header h2 {
+      font-size:1.4rem; font-weight:700; color:var(--neutral-900);
+    }
+    .page-header p { font-size:.85rem; color:var(--neutral-500); margin-top:2px; }
+
+    /* ── EMPTY STATE ─────────────────────────────────────────────── */
+    .empty-state {
+      text-align:center; padding:48px 24px; color:var(--neutral-500);
+    }
+    .empty-state .es-icon { font-size:40px; margin-bottom:12px; }
+    .empty-state p { font-size:.9rem; }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────────── */
+    @media (max-width:768px) {
+      .sidebar { transform:translateX(-100%); }
+      .sidebar.open { transform:translateX(0); }
+      .main-area { margin-left:0; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+      .form-grid { grid-template-columns:1fr; }
+      .topbar { padding:0 16px; }
+      .page-content { padding:16px; }
+    }
+
+    /* ── PRINTABLE ────────────────────────────────────────────────── */
+    @media print {
+      .sidebar, .topbar, .no-print { display:none !important; }
+      .main-area { margin-left:0; }
+      body { background:#fff; }
+    }
+
+    /* ── PROFILE CARD ──────────────────────────────────────────── */
+    .profile-card {
+      display:flex; align-items:center; gap:16px;
+      padding:20px; background:var(--brand-light);
+      border-radius:var(--radius); margin-bottom:20px;
+    }
+    .profile-avatar {
+      width:56px; height:56px; border-radius:50%;
+      background:var(--brand-primary); color:#fff;
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px; font-weight:700; flex-shrink:0;
+      font-family:var(--font-display);
+    }
+    .profile-info h4 { font-size:1rem; font-weight:700; color:var(--brand-dark); }
+    .profile-info p  { font-size:.82rem; color:var(--neutral-500); }
+
+    /* ── TAB NAV ─────────────────────────────────────────────────── */
+    .tab-nav {
+      display:flex; gap:4px; background:var(--neutral-100);
+      border-radius:var(--radius-sm); padding:4px; margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+    .tab-btn {
+      padding:8px 16px; border-radius:6px; border:none;
+      font-family:var(--font-body); font-size:.82rem; font-weight:600;
+      cursor:pointer; transition:all var(--transition);
+      background:transparent; color:var(--neutral-500);
+    }
+    .tab-btn.active { background:#fff; color:var(--brand-primary); box-shadow:var(--shadow-sm); }
+
+    /* ── MOBILE MENU BTN ─────────────────────────────────────────── */
+    .mobile-menu-btn {
+      display:none; background:none; border:none; font-size:22px;
+      cursor:pointer; color:var(--neutral-700); padding:4px;
+    }
+    @media (max-width:768px) { .mobile-menu-btn { display:block; } }
+
+    /* ─── BLOOD TYPE PILLS ─────────────────────────────────────── */
+    .blood-pill {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:36px; height:36px; border-radius:50%; font-weight:700;
+      font-size:.82rem; background:#FEE2E2; color:#DC2626;
+    }
+
+    /* ── CALENDAR MINI ───────────────────────────────────────────── */
+    .apt-slot {
+      display:flex; gap:12px; align-items:center;
+      padding:12px; border:1px solid var(--neutral-200);
+      border-radius:var(--radius-sm); margin-bottom:8px;
+      background:#fff;
+    }
+    .apt-slot .slot-date {
+      width:44px; text-align:center; flex-shrink:0;
+    }
+    .apt-slot .slot-date .day { font-size:1.3rem; font-weight:700; color:var(--brand-primary); line-height:1; }
+    .apt-slot .slot-date .mon { font-size:.68rem; color:var(--neutral-500); text-transform:uppercase; }
+    .apt-slot .slot-info h5 { font-size:.88rem; font-weight:600; }
+    .apt-slot .slot-info p  { font-size:.78rem; color:var(--neutral-500); }
+  </style>
 </head>
-
 <body>
 
-<div class="sidebar">
-<h2>🏥 MedCentre X</h2>
-<li onclick="Router.go('dashboard')">Dashboard</li>
-<li onclick="Router.go('patients')">Patients</li>
-<li onclick="Router.go('consultations')">Consultations</li>
-<li onclick="Router.go('laboratory')">Laboratory</li>
-<li onclick="Router.go('pharmacy')">Pharmacy</li>
-<li onclick="Router.go('billing')">Billing</li>
-<li onclick="Router.go('reports')">Reports</li>
-<li onclick="Router.go('audit')">Audit Log</li>
+<!-- ================================================================
+     AUTH SCREEN
+     ✏️  CUSTOMISE: Change default passwords in the JS section below
+     (search for "DEFAULT ACCOUNTS")
+================================================================ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon">🏥</div>
+      <h1>Tali Medicals</h1>
+      <!-- ✏️ CUSTOMISE: Change tagline below -->
+      <p>Compassionate Care, Professional Excellence</p>
+    </div>
+    <div class="form-group">
+      <label>Role</label>
+      <select class="form-control" id="login-role">
+        <option value="admin">Administrator</option>
+        <option value="doctor">Doctor</option>
+        <option value="nurse">Nurse</option>
+        <option value="pharmacist">Pharmacist</option>
+        <option value="laboratorist">Laboratorist</option>
+        <option value="accountant">Accountant</option>
+        <option value="patient">Patient</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Email / Username</label>
+      <input class="form-control" id="login-email" type="text" placeholder="Enter your email" autocomplete="off"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input class="form-control" id="login-pass" type="password" placeholder="Enter your password"/>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="doLogin()">Sign In →</button>
+    <p style="text-align:center;margin-top:16px;font-size:.78rem;color:var(--neutral-500)">
+      <!-- ✏️ CUSTOMISE: Update hint text or remove after going live -->
+      Demo: admin / admin@tali.com / admin123
+    </p>
+  </div>
 </div>
 
-<div class="main">
-<div class="topbar">
-<h1 id="pageTitle">Dashboard</h1>
-<div>
-Role:
-<select id="roleSelect" onchange="Auth.setRole(this.value)">
-<option>Admin</option>
-<option>Doctor</option>
-<option>Lab</option>
-<option>Pharmacy</option>
-<option>Reception</option>
-</select>
-</div>
-</div>
-<div id="app"></div>
+<!-- ================================================================
+     MAIN APP
+================================================================ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="s-icon">🏥</div>
+        <div>
+          <!-- ✏️ CUSTOMISE: Facility name -->
+          <h2>Tali Medicals</h2>
+          <span>HMS v1.0</span>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <p>Signed in as</p>
+      <strong id="sb-name">—</strong>
+      <em id="sb-role">—</em>
+    </div>
+    <div id="sidebar-nav"></div>
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="doLogout()">
+        <span class="nav-icon">🚪</span> Sign Out
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-left">
+          <h3 id="page-title">Dashboard</h3>
+          <p id="page-subtitle">Welcome back</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-badge" id="topbar-date"></span>
+        <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+      </div>
+    </div>
+
+    <div class="page-content" id="page-content">
+      <!-- Pages rendered here by JS -->
+    </div>
+  </div>
 </div>
 
+<!-- MODAL CONTAINER -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title">Modal</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ================================================================
+     JAVASCRIPT — APPLICATION ENGINE
+================================================================ -->
 <script>
+'use strict';
 
-/* ================= CONFIG ================= */
+/* ================================================================
+   CONFIGURATION
+   ✏️  CUSTOMISE: Change facility details, default departments, etc.
+================================================================ */
+const CONFIG = {
+  // ✏️ Change facility name & contact
+  facilityName:    'Tali Medicals',
+  facilityAddress: '123 Health Avenue, Medical City',    // ← change this
+  facilityPhone:   '+1 (555) 000-0000',                  // ← change this
+  facilityEmail:   'info@talimedicals.com',              // ← change this
 
-const CONFIG={
-MODE:"LOCAL", // change to JSONBIN later
-CONSULT_FEE:25
+  // ✏️ Default departments (Admin can add more inside the system)
+  defaultDepartments: [
+    'General Medicine', 'Cardiology', 'Paediatrics',
+    'Gynaecology', 'Orthopaedics', 'Dermatology',
+    'ENT', 'Ophthalmology', 'Neurology', 'Emergency'
+  ],
+
+  // ✏️ Default bed types
+  bedTypes: ['Ward', 'Cabin', 'ICU', 'Emergency', 'Maternity'],
+
+  // Blood groups
+  bloodGroups: ['A+','A-','B+','B-','AB+','AB-','O+','O-'],
+
+  // Lab test types
+  labTests: [
+    'Full Blood Count','Urinalysis','Blood Glucose','Liver Function',
+    'Kidney Function','Lipid Panel','Thyroid Panel','HIV Test',
+    'Malaria Test','Pregnancy Test','COVID-19 Test','X-Ray','Ultrasound','ECG'
+  ]
 };
 
-/* ================= UTIL ================= */
-
-const Util={
-id:()=>Date.now()+Math.random().toString(16).slice(2),
-now:()=>new Date().toISOString()
+/* ================================================================
+   DEFAULT ACCOUNTS
+   ✏️  CUSTOMISE: Change usernames and passwords before going live.
+       After first login as admin, go to Staff Management to add
+       real accounts. These are fallback logins only.
+================================================================ */
+const DEFAULT_ACCOUNTS = {
+  admin:        { email:'admin@tali.com',       password:'admin123',    name:'System Admin',      id:'ADM001' },
+  doctor:       { email:'doctor@tali.com',      password:'doctor123',   name:'Dr. A. Johnson',    id:'DOC001' },
+  nurse:        { email:'nurse@tali.com',       password:'nurse123',    name:'Nurse B. Williams', id:'NRS001' },
+  pharmacist:   { email:'pharma@tali.com',      password:'pharma123',   name:'Ph. C. Davis',      id:'PHA001' },
+  laboratorist: { email:'lab@tali.com',         password:'lab123',      name:'Lab. D. Miller',    id:'LAB001' },
+  accountant:   { email:'accounts@tali.com',    password:'accounts123', name:'Acc. E. Wilson',    id:'ACC001' },
+  patient:      { email:'patient@tali.com',     password:'patient123',  name:'Sample Patient',    id:'PAT001' },
 };
 
-/* ================= RBAC ================= */
-
-const Auth={
-role:"Admin",
-setRole(r){this.role=r; Router.go("dashboard");},
-can(module){
-const map={
-Admin:["*"],
-Doctor:["dashboard","patients","consultations"],
-Lab:["laboratory"],
-Pharmacy:["pharmacy"],
-Reception:["patients","billing"]
-};
-return map[this.role].includes("*") || map[this.role].includes(module);
-}
-};
-
-/* ================= DATA ================= */
-
-const Storage={
-load(){
-return {
-patients:JSON.parse(localStorage.getItem("patients"))||[],
-consultations:JSON.parse(localStorage.getItem("consultations"))||[],
-labs:JSON.parse(localStorage.getItem("labs"))||[],
-pharmacy:JSON.parse(localStorage.getItem("pharmacy"))||[],
-billing:JSON.parse(localStorage.getItem("billing"))||[],
-audit:JSON.parse(localStorage.getItem("audit"))||[]
-};
-},
-save(data){
-Object.keys(data).forEach(k=>{
-localStorage.setItem(k,JSON.stringify(data[k]));
-});
-}
-};
-
-/* ================= STATE ================= */
-
-const State={
-data:null,
-init(){this.data=Storage.load();},
-save(){Storage.save(this.data);},
-log(action){
-this.data.audit.push({
-id:Util.id(),
-action,
-time:Util.now(),
-role:Auth.role
-});
-}
-};
-
-/* ================= ROUTER ================= */
-
-const Router={
-go(page){
-if(!Auth.can(page)){ alert("Access Denied"); return; }
-document.getElementById("pageTitle").innerText=
-page.charAt(0).toUpperCase()+page.slice(1);
-document.getElementById("app").innerHTML=Modules[page]();
-}
+/* ================================================================
+   DATA LAYER  (localStorage)
+   All data lives in localStorage under key "tali_hms"
+================================================================ */
+const DB = {
+  _key: 'tali_hms_v1',
+  _defaults() {
+    return {
+      patients:      [],
+      doctors:       [],
+      nurses:        [],
+      pharmacists:   [],
+      laboratorists: [],
+      accountants:   [],
+      appointments:  [],
+      prescriptions: [],
+      medicines:     [],
+      medicineCategories: [],
+      beds:          [],
+      bedAllotments: [],
+      invoices:      [],
+      payments:      [],
+      labResults:    [],
+      bloodDonors:   [],
+      noticeboard:   [],
+      departments:   CONFIG.defaultDepartments.map((n,i)=>({id:'DEP'+(i+1),name:n,description:''})),
+      staff:         [],  // unified staff store (all roles)
+      settings: {
+        facilityName:    CONFIG.facilityName,
+        facilityAddress: CONFIG.facilityAddress,
+        facilityPhone:   CONFIG.facilityPhone,
+        facilityEmail:   CONFIG.facilityEmail,
+      }
+    };
+  },
+  load() {
+    try {
+      const raw = localStorage.getItem(this._key);
+      return raw ? { ...this._defaults(), ...JSON.parse(raw) } : this._defaults();
+    } catch { return this._defaults(); }
+  },
+  save(data) {
+    localStorage.setItem(this._key, JSON.stringify(data));
+  },
+  get()           { return this.load(); },
+  set(cb)         { const d = this.load(); cb(d); this.save(d); },
+  uid(prefix='')  { return prefix + Date.now() + Math.random().toString(36).slice(2,6).toUpperCase(); },
+  today()         { return new Date().toISOString().split('T')[0]; },
+  fmt(dateStr)    {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+  },
+  fmtDT(dateStr)  {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }
 };
 
-/* ================= MODULES ================= */
+/* ================================================================
+   AUTH
+================================================================ */
+let SESSION = null;
 
-const Modules={
+function doLogin() {
+  const role  = el('login-role').value;
+  const email = el('login-email').value.trim();
+  const pass  = el('login-pass').value;
+  const acct  = DEFAULT_ACCOUNTS[role];
 
-dashboard:()=>`
-<div class="card">
-<h3>Total Patients</h3>
-<h2>${State.data.patients.length}</h2>
-</div>
-<div class="card">
-<h3>Total Revenue</h3>
-<h2>$${State.data.billing.reduce((a,b)=>a+Number(b.amount||0),0)}</h2>
-</div>
-`,
-
-patients:()=>`
-<div class="card">
-<h3>Register Patient</h3>
-<input id="p_name" placeholder="Full Name">
-<input id="p_dob" type="date">
-<input id="p_phone" placeholder="Phone">
-<button onclick="addPatient()">Save</button>
-</div>
-<div class="card">
-${State.data.patients.map(p=>`
-<p><strong>${p.name}</strong> | ${p.phone}</p>
-`).join("")}
-</div>
-`,
-
-consultations:()=>`
-<div class="card">
-<h3>SOAP Consultation</h3>
-<input id="c_patient" placeholder="Patient">
-<textarea id="c_note" placeholder="SOAP Notes"></textarea>
-<button onclick="saveConsult()">Save & Auto Bill</button>
-</div>
-`,
-
-laboratory:()=>`
-<div class="card">
-<h3>Order Lab</h3>
-<input id="lab_patient" placeholder="Patient">
-<input id="lab_test" placeholder="Test">
-<input id="lab_fee" type="number" placeholder="Fee">
-<button onclick="orderLab()">Order</button>
-</div>
-<div class="card">
-${State.data.labs.map(l=>`
-<p>${l.patient} | ${l.test} | 
-<span class="badge status-${l.status}">${l.status}</span>
-</p>
-`).join("")}
-</div>
-`,
-
-pharmacy:()=>`
-<div class="card">
-<h3>Add Drug</h3>
-<input id="drug_name" placeholder="Drug Name">
-<input id="drug_stock" type="number" placeholder="Stock">
-<input id="drug_price" type="number" placeholder="Unit Price">
-<button onclick="addDrug()">Add</button>
-</div>
-<div class="card">
-${State.data.pharmacy.map(d=>`
-<p>${d.name} | 
-Stock: <span class="${d.stock<5?'low-stock':''}">
-${d.stock}</span> | 
-$${d.price}
-</p>
-`).join("")}
-</div>
-`,
-
-billing:()=>`
-<div class="card">
-<h3>Billing Records</h3>
-${State.data.billing.map(b=>`
-<p>${b.patient} | $${b.amount}</p>
-`).join("")}
-</div>
-`,
-
-reports:()=>`
-<div class="card">
-<p>Consultations: ${State.data.consultations.length}</p>
-<p>Lab Orders: ${State.data.labs.length}</p>
-<p>Revenue: $${State.data.billing.reduce((a,b)=>a+Number(b.amount||0),0)}</p>
-</div>
-`,
-
-audit:()=>`
-<div class="card">
-${State.data.audit.map(a=>`
-<p>${a.time} | ${a.role} | ${a.action}</p>
-`).join("")}
-</div>
-`
-};
-
-/* ================= OPERATIONS ================= */
-
-function addPatient(){
-State.data.patients.push({
-id:Util.id(),
-name:p_name.value,
-dob:p_dob.value,
-phone:p_phone.value
-});
-State.log("Patient Registered");
-State.save();
-Router.go("patients");
+  // Check built-in accounts
+  if (acct && email === acct.email && pass === acct.password) {
+    SESSION = { role, name: acct.name, id: acct.id };
+    startApp();
+    return;
+  }
+  // Check DB staff accounts
+  const db = DB.get();
+  const pool = {
+    doctor:       db.doctors,
+    nurse:        db.nurses,
+    pharmacist:   db.pharmacists,
+    laboratorist: db.laboratorists,
+    accountant:   db.accountants,
+    patient:      db.patients,
+  }[role] || [];
+  const found = pool.find(u => u.email === email && u.password === pass);
+  if (found) {
+    SESSION = { role, name: found.name, id: found.id };
+    startApp();
+    return;
+  }
+  showToast('Invalid credentials. Please try again.', 'error');
 }
 
-function saveConsult(){
-State.data.consultations.push({
-id:Util.id(),
-patient:c_patient.value,
-note:c_note.value,
-time:Util.now()
-});
-State.data.billing.push({
-id:Util.id(),
-patient:c_patient.value,
-amount:CONFIG.CONSULT_FEE
-});
-State.log("Consultation + Billing");
-State.save();
-Router.go("dashboard");
+function doLogout() {
+  SESSION = null;
+  el('app').classList.remove('active');
+  el('auth-screen').style.display = 'flex';
+  el('login-pass').value = '';
 }
 
-function orderLab(){
-State.data.labs.push({
-id:Util.id(),
-patient:lab_patient.value,
-test:lab_test.value,
-fee:lab_fee.value,
-status:"pending"
-});
-State.data.billing.push({
-id:Util.id(),
-patient:lab_patient.value,
-amount:lab_fee.value
-});
-State.log("Lab Ordered + Billing");
-State.save();
-Router.go("dashboard");
+function startApp() {
+  el('auth-screen').style.display = 'none';
+  el('app').classList.add('active');
+  el('sb-name').textContent = SESSION.name;
+  el('sb-role').textContent = SESSION.role.charAt(0).toUpperCase() + SESSION.role.slice(1);
+  el('topbar-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  buildSidebar();
+  navigate(NAV[SESSION.role][0].page);
 }
 
-function addDrug(){
-State.data.pharmacy.push({
-id:Util.id(),
-name:drug_name.value,
-stock:Number(drug_stock.value),
-price:Number(drug_price.value)
-});
-State.log("Drug Added");
-State.save();
-Router.go("pharmacy");
+/* ================================================================
+   NAVIGATION MAP
+   ✏️  CUSTOMISE: Add/remove menu items per role below
+================================================================ */
+const NAV = {
+  admin: [
+    { icon:'📊', label:'Dashboard',       page:'dash-admin' },
+    { icon:'👤', label:'Patients',        page:'patients',   section:'Patient Management' },
+    { icon:'👨‍⚕️', label:'Doctors',         page:'doctors' },
+    { icon:'👩‍⚕️', label:'Nurses',          page:'nurses' },
+    { icon:'💊', label:'Pharmacists',     page:'pharmacists' },
+    { icon:'🔬', label:'Laboratorists',   page:'laboratorists' },
+    { icon:'💼', label:'Accountants',     page:'accountants' },
+    { icon:'🏥', label:'Departments',     page:'departments', section:'Hospital' },
+    { icon:'🛏️', label:'Beds / Wards',    page:'beds' },
+    { icon:'📋', label:'Appointments',    page:'appointments' },
+    { icon:'💰', label:'Invoices',        page:'invoices' },
+    { icon:'📢', label:'Noticeboard',     page:'noticeboard', section:'System' },
+    { icon:'⚙️', label:'Settings',        page:'settings' },
+  ],
+  doctor: [
+    { icon:'📊', label:'Dashboard',       page:'dash-doctor' },
+    { icon:'👤', label:'My Patients',     page:'patients',   section:'Clinical' },
+    { icon:'📅', label:'Appointments',    page:'appointments' },
+    { icon:'📝', label:'Prescriptions',   page:'prescriptions' },
+    { icon:'🛏️', label:'Bed Allotment',   page:'beds' },
+    { icon:'📈', label:'Reports',         page:'reports',    section:'Records' },
+    { icon:'🩸', label:'Blood Bank',      page:'bloodbank' },
+  ],
+  nurse: [
+    { icon:'📊', label:'Dashboard',       page:'dash-nurse' },
+    { icon:'👤', label:'Patients',        page:'patients',   section:'Care' },
+    { icon:'🛏️', label:'Manage Beds',     page:'beds' },
+    { icon:'📢', label:'Noticeboard',     page:'noticeboard', section:'Info' },
+  ],
+  pharmacist: [
+    { icon:'📊', label:'Dashboard',       page:'dash-pharma' },
+    { icon:'💊', label:'Medicine Stock',  page:'medicines',  section:'Pharmacy' },
+    { icon:'🗂️', label:'Categories',      page:'med-cats' },
+    { icon:'📝', label:'Prescriptions',   page:'prescriptions' },
+  ],
+  laboratorist: [
+    { icon:'📊', label:'Dashboard',       page:'dash-lab' },
+    { icon:'🔬', label:'Lab Results',     page:'lab-results', section:'Laboratory' },
+    { icon:'📝', label:'Prescriptions',   page:'prescriptions' },
+    { icon:'🩸', label:'Blood Bank',      page:'bloodbank' },
+    { icon:'🫀', label:'Blood Donors',    page:'blood-donors' },
+  ],
+  accountant: [
+    { icon:'📊', label:'Dashboard',       page:'dash-accounts' },
+    { icon:'🧾', label:'Invoices',        page:'invoices',   section:'Billing' },
+    { icon:'💳', label:'Payments',        page:'payments' },
+    { icon:'🩸', label:'Blood Bank',      page:'bloodbank',  section:'View' },
+  ],
+  patient: [
+    { icon:'📊', label:'My Dashboard',    page:'dash-patient' },
+    { icon:'📅', label:'My Appointments', page:'appointments', section:'My Records' },
+    { icon:'📝', label:'My Prescriptions',page:'prescriptions' },
+    { icon:'🧾', label:'My Bills',        page:'invoices' },
+    { icon:'🔬', label:'My Lab Results',  page:'lab-results' },
+  ],
+};
+
+function buildSidebar() {
+  const items = NAV[SESSION.role] || [];
+  let html = ''; let lastSection = null;
+  items.forEach(item => {
+    if (item.section && item.section !== lastSection) {
+      html += `<div class="nav-section-label" style="padding:12px 20px 4px;font-size:.62rem;letter-spacing:.1em;color:rgba(255,255,255,.3);text-transform:uppercase;font-weight:700">${item.section}</div>`;
+      lastSection = item.section;
+    }
+    html += `<div class="nav-item" id="nav-${item.page}" onclick="navigate('${item.page}')">
+      <span class="nav-icon">${item.icon}</span> ${item.label}
+    </div>`;
+  });
+  el('sidebar-nav').innerHTML = `<div style="padding:8px 12px">${html}</div>`;
 }
 
-/* ================= INIT ================= */
+let currentPage = '';
+function navigate(page) {
+  currentPage = page;
+  // Update active nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navEl = el('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+  // Update page title
+  const item = (NAV[SESSION.role]||[]).find(i=>i.page===page);
+  el('page-title').textContent   = item ? item.label : page;
+  el('page-subtitle').textContent = CONFIG.facilityName + ' · ' + SESSION.role;
+  // Render page
+  el('page-content').innerHTML = renderPage(page);
+  // Close mobile sidebar
+  el('sidebar').classList.remove('open');
+}
 
-State.init();
-Router.go("dashboard");
+function toggleSidebar() { el('sidebar').classList.toggle('open'); }
 
+/* ================================================================
+   PAGE RENDERERS
+================================================================ */
+function renderPage(page) {
+  const renders = {
+    'dash-admin':    renderAdminDash,
+    'dash-doctor':   renderDoctorDash,
+    'dash-nurse':    renderNurseDash,
+    'dash-pharma':   renderPharmaDash,
+    'dash-lab':      renderLabDash,
+    'dash-accounts': renderAccountsDash,
+    'dash-patient':  renderPatientDash,
+    'patients':      renderPatients,
+    'doctors':       renderDoctors,
+    'nurses':        renderNurses,
+    'pharmacists':   renderPharmacists,
+    'laboratorists': renderLaboratorists,
+    'accountants':   renderAccountants,
+    'departments':   renderDepartments,
+    'beds':          renderBeds,
+    'appointments':  renderAppointments,
+    'prescriptions': renderPrescriptions,
+    'invoices':      renderInvoices,
+    'payments':      renderPayments,
+    'medicines':     renderMedicines,
+    'med-cats':      renderMedCats,
+    'lab-results':   renderLabResults,
+    'bloodbank':     renderBloodBank,
+    'blood-donors':  renderBloodDonors,
+    'reports':       renderReports,
+    'noticeboard':   renderNoticeboard,
+    'settings':      renderSettings,
+  };
+  return (renders[page] || (() => `<div class="empty-state"><div class="es-icon">🔧</div><p>Page under construction</p></div>`))();
+}
+
+/* ─── DASHBOARDS ──────────────────────────────────────────────── */
+function statCard(icon,label,value,colorClass,sub='') {
+  return `<div class="stat-card">
+    <div class="stat-icon ${colorClass}">${icon}</div>
+    <div class="stat-label">${label}</div>
+    <div class="stat-value">${value}</div>
+    ${sub?`<div class="stat-sub">${sub}</div>`:''}
+  </div>`;
+}
+
+function renderAdminDash() {
+  const d = DB.get();
+  const today = DB.today();
+  const todayApts = d.appointments.filter(a=>a.date===today).length;
+  const pendingInv = d.invoices.filter(i=>i.status!=='paid').length;
+  const occupied = d.beds.filter(b=>b.status==='occupied').length;
+  return `
+  <div class="stats-grid">
+    ${statCard('👤','Total Patients',d.patients.length,'bg-blue','Registered')}
+    ${statCard('👨‍⚕️','Doctors',d.doctors.length,'bg-green','')}
+    ${statCard('📅','Today\'s Apts',todayApts,'bg-orange','Scheduled')}
+    ${statCard('🛏️','Beds Occupied',occupied+' / '+d.beds.length,'bg-red','')}
+    ${statCard('💊','Medicines',d.medicines.length,'bg-purple','In stock')}
+    ${statCard('🧾','Pending Bills',pendingInv,'bg-warning','Invoices')}
+    ${statCard('🩸','Blood Donors',d.bloodDonors.length,'bg-pink','')}
+    ${statCard('📢','Notices',d.noticeboard.length,'bg-indigo','')}
+  </div>
+  ${renderNoticeSection(d)}
+  ${renderRecentPatients(d)}`;
+}
+
+function renderDoctorDash() {
+  const d = DB.get(); const today = DB.today();
+  const myApts = d.appointments.filter(a=>a.doctorId===SESSION.id&&a.date===today);
+  const myPatients = d.prescriptions.filter(p=>p.doctorId===SESSION.id).map(p=>p.patientId);
+  const uniquePats = [...new Set(myPatients)].length;
+  return `
+  <div class="stats-grid">
+    ${statCard('📅','Today\'s Apts',myApts.length,'bg-blue','Scheduled')}
+    ${statCard('👤','My Patients',uniquePats,'bg-green','Total seen')}
+    ${statCard('📝','Prescriptions',d.prescriptions.filter(p=>p.doctorId===SESSION.id).length,'bg-orange','')}
+    ${statCard('🛏️','Beds',d.beds.filter(b=>b.status==='occupied').length,'bg-red','Occupied')}
+  </div>
+  ${renderTodayAppointments(d,today)}`;
+}
+
+function renderNurseDash() {
+  const d = DB.get();
+  return `
+  <div class="stats-grid">
+    ${statCard('👤','Total Patients',d.patients.length,'bg-blue','')}
+    ${statCard('🛏️','Available Beds',d.beds.filter(b=>b.status==='available').length,'bg-green','')}
+    ${statCard('🛏️','Occupied Beds',d.beds.filter(b=>b.status==='occupied').length,'bg-red','')}
+    ${statCard('📢','Notices',d.noticeboard.length,'bg-orange','')}
+  </div>
+  ${renderNoticeSection(d)}`;
+}
+
+function renderPharmaDash() {
+  const d = DB.get();
+  const low = d.medicines.filter(m=>parseInt(m.stock||0)<10).length;
+  return `
+  <div class="stats-grid">
+    ${statCard('💊','Total Medicines',d.medicines.length,'bg-blue','')}
+    ${statCard('🗂️','Categories',d.medicineCategories.length,'bg-green','')}
+    ${statCard('⚠️','Low Stock',low,'bg-red','<10 units')}
+    ${statCard('📝','Prescriptions',d.prescriptions.length,'bg-orange','Pending fill')}
+  </div>
+  ${renderMedTable(d)}`;
+}
+
+function renderLabDash() {
+  const d = DB.get();
+  return `
+  <div class="stats-grid">
+    ${statCard('🔬','Lab Results',d.labResults.length,'bg-blue','')}
+    ${statCard('📝','Prescriptions',d.prescriptions.length,'bg-green','For review')}
+    ${statCard('🩸','Blood Donors',d.bloodDonors.length,'bg-red','')}
+    ${statCard('🏦','Blood Groups',CONFIG.bloodGroups.length,'bg-orange','Tracked')}
+  </div>`;
+}
+
+function renderAccountsDash() {
+  const d = DB.get();
+  const totalPaid = d.payments.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  const pending   = d.invoices.filter(i=>i.status!=='paid').reduce((s,i)=>s+(parseFloat(i.amount)||0),0);
+  return `
+  <div class="stats-grid">
+    ${statCard('🧾','Total Invoices',d.invoices.length,'bg-blue','')}
+    ${statCard('✅','Paid',d.invoices.filter(i=>i.status==='paid').length,'bg-green','')}
+    ${statCard('⏳','Pending',d.invoices.filter(i=>i.status!=='paid').length,'bg-warning','')}
+    ${statCard('💰','Revenue',formatCurrency(totalPaid),'bg-teal','Collected')}
+    ${statCard('📌','Outstanding',formatCurrency(pending),'bg-red','Unpaid')}
+  </div>`;
+}
+
+function renderPatientDash() {
+  const d = DB.get();
+  const myApts = d.appointments.filter(a=>a.patientId===SESSION.id);
+  const myPx   = d.prescriptions.filter(p=>p.patientId===SESSION.id);
+  const myInv  = d.invoices.filter(i=>i.patientId===SESSION.id);
+  return `
+  <div class="stats-grid">
+    ${statCard('📅','Appointments',myApts.length,'bg-blue','')}
+    ${statCard('📝','Prescriptions',myPx.length,'bg-green','')}
+    ${statCard('🧾','Bills',myInv.length,'bg-orange','')}
+    ${statCard('✅','Paid Bills',myInv.filter(i=>i.status==='paid').length,'bg-teal','')}
+  </div>
+  ${renderNoticeSection(d)}`;
+}
+
+function renderNoticeSection(d) {
+  if (!d.noticeboard.length) return '';
+  return `<div class="card"><div class="card-header"><h4>📢 Noticeboard</h4></div><div class="card-body">
+    ${d.noticeboard.slice(0,3).map(n=>`<div class="notice-item">
+      <h5>${esc(n.title)}</h5><p>${esc(n.notice)}</p>
+      <span>${DB.fmt(n.date)}</span>
+    </div>`).join('')}
+  </div></div>`;
+}
+
+function renderRecentPatients(d) {
+  const pts = d.patients.slice(-5).reverse();
+  if (!pts.length) return `<div class="empty-state"><div class="es-icon">👤</div><p>No patients registered yet. <a href="#" onclick="navigate('patients')">Register a patient →</a></p></div>`;
+  return `<div class="card"><div class="card-header"><h4>Recent Patients</h4><button class="btn btn-sm btn-outline" onclick="navigate('patients')">View All</button></div><div class="card-body table-wrap">
+    <table><thead><tr><th>Name</th><th>ID</th><th>Blood</th><th>Phone</th><th>Registered</th></tr></thead><tbody>
+    ${pts.map(p=>`<tr><td><strong>${esc(p.name)}</strong></td><td>${esc(p.id)}</td><td><span class="blood-pill">${esc(p.bloodGroup)}</span></td><td>${esc(p.phone)}</td><td>${DB.fmt(p.createdAt)}</td></tr>`).join('')}
+    </tbody></table>
+  </div></div>`;
+}
+
+function renderTodayAppointments(d,today) {
+  const apts = d.appointments.filter(a=>a.date===today);
+  if (!apts.length) return `<div class="card"><div class="card-header"><h4>Today's Appointments</h4></div><div class="card-body"><div class="empty-state"><div class="es-icon">📅</div><p>No appointments scheduled for today.</p></div></div></div>`;
+  return `<div class="card"><div class="card-header"><h4>Today's Appointments</h4></div><div class="card-body">
+    ${apts.map(a=>{const pt=d.patients.find(p=>p.id===a.patientId)||{name:'Unknown'};return `<div class="apt-slot">
+      <div class="slot-date"><div class="day">${new Date(a.date).getDate()}</div><div class="mon">${new Date(a.date).toLocaleString('default',{month:'short'})}</div></div>
+      <div class="slot-info"><h5>${esc(pt.name)}</h5><p>${esc(a.time)||'—'} · ${esc(a.reason)||'General consultation'}</p></div>
+      <span class="badge badge-${a.status==='completed'?'success':a.status==='cancelled'?'danger':'info'}" style="margin-left:auto">${a.status||'scheduled'}</span>
+    </div>`}).join('')}
+  </div></div>`;
+}
+
+function renderMedTable(d) {
+  return `<div class="card"><div class="card-header"><h4>Medicine Inventory</h4></div><div class="card-body table-wrap">
+    <table><thead><tr><th>Medicine</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th></tr></thead><tbody>
+    ${d.medicines.slice(0,8).map(m=>{
+      const cat=d.medicineCategories.find(c=>c.id===m.categoryId)||{name:'—'};
+      const stock=parseInt(m.stock||0);
+      return `<tr><td><strong>${esc(m.name)}</strong></td><td>${esc(cat.name)}</td><td>${formatCurrency(m.price)}</td><td>${stock}</td>
+        <td><span class="badge badge-${stock<1?'danger':stock<10?'warning':'success'}">${stock<1?'Out of Stock':stock<10?'Low Stock':'In Stock'}</span></td></tr>`;
+    }).join('')}
+    </tbody></table>
+  </div></div>`;
+}
+
+/* ─── PATIENTS ────────────────────────────────────────────────── */
+function renderPatients() {
+  const d = DB.get();
+  const pts = SESSION.role==='patient' ? d.patients.filter(p=>p.id===SESSION.id) : d.patients;
+  const canEdit = ['admin','doctor','nurse'].includes(SESSION.role);
+  return `
+  <div class="page-header">
+    <div><h2>Patient Records</h2><p>Manage all registered patients</p></div>
+    ${canEdit?`<button class="btn btn-primary" onclick="openPatientForm()">+ Register Patient</button>`:''}
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h4>All Patients (${pts.length})</h4>
+      <div class="search-bar" style="margin:0">
+        <input class="search-input" placeholder="Search patients..." oninput="filterTable(this,'patients-tbody')"/>
+      </div>
+    </div>
+    <div class="card-body table-wrap">
+      <table><thead><tr><th>Patient ID</th><th>Name</th><th>Age/Sex</th><th>Blood</th><th>Phone</th><th>Email</th><th>Registered</th>${canEdit?'<th>Actions</th>':''}</tr></thead>
+      <tbody id="patients-tbody">
+        ${pts.length ? pts.map(p=>`<tr>
+          <td><code>${esc(p.id)}</code></td>
+          <td><strong>${esc(p.name)}</strong></td>
+          <td>${esc(p.age)||'?'}y / ${esc(p.sex)||'—'}</td>
+          <td><span class="blood-pill">${esc(p.bloodGroup)||'?'}</span></td>
+          <td>${esc(p.phone)}</td>
+          <td>${esc(p.email)}</td>
+          <td>${DB.fmt(p.createdAt)}</td>
+          ${canEdit?`<td class="td-actions">
+            <button class="btn btn-sm btn-secondary" onclick="openPatientForm('${p.id}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteRecord('patients','${p.id}','Patient')">Del</button>
+          </td>`:''}
+        </tr>`).join('') : `<tr><td colspan="8"><div class="empty-state"><div class="es-icon">👤</div><p>No patients found. Register the first one!</p></div></td></tr>`}
+      </tbody></table>
+    </div>
+  </div>`;
+}
+
+function openPatientForm(id='') {
+  const d = DB.get();
+  const p = id ? d.patients.find(x=>x.id===id) : {};
+  openModal(id?'Edit Patient':'Register New Patient', `
+  <div class="form-grid">
+    <div class="form-group full">
+      <label>Full Name *</label>
+      <input class="form-control" id="f-name" value="${esc(p.name||'')}" placeholder="Patient's full name"/>
+    </div>
+    <div class="form-group"><label>Email</label><input class="form-control" id="f-email" type="email" value="${esc(p.email||'')}" placeholder="email@example.com"/></div>
+    <div class="form-group"><label>Password (for portal access)</label><input class="form-control" id="f-pass" type="password" value="${esc(p.password||'')}" placeholder="Set patient login password"/></div>
+    <div class="form-group"><label>Phone</label><input class="form-control" id="f-phone" value="${esc(p.phone||'')}" placeholder="+1 555 000 0000"/></div>
+    <div class="form-group"><label>Date of Birth</label><input class="form-control" id="f-dob" type="date" value="${esc(p.dob||'')}"/></div>
+    <div class="form-group"><label>Age</label><input class="form-control" id="f-age" type="number" value="${esc(p.age||'')}" placeholder="Years"/></div>
+    <div class="form-group"><label>Sex</label>
+      <select class="form-control" id="f-sex">
+        <option value="">Select</option>
+        ${['Male','Female','Other'].map(s=>`<option ${p.sex===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Blood Group</label>
+      <select class="form-control" id="f-blood">
+        <option value="">Unknown</option>
+        ${CONFIG.bloodGroups.map(b=>`<option ${p.bloodGroup===b?'selected':''}>${b}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group full"><label>Address</label><textarea class="form-control" id="f-addr">${esc(p.address||'')}</textarea></div>
+    <!-- ✏️  CUSTOMISE: Add more fields here (e.g., insurance number, next-of-kin, etc.) -->
+  </div>`, [
+    { label: id?'Save Changes':'Register Patient', cls:'btn-primary', action: ()=>savePatient(id) }
+  ]);
+}
+
+function savePatient(id) {
+  const name = val('f-name'); if (!name) { showToast('Name is required','error'); return; }
+  DB.set(d=>{
+    const p = {
+      id:        id || DB.uid('PAT'),
+      name,
+      email:     val('f-email'),
+      password:  val('f-pass'),
+      phone:     val('f-phone'),
+      dob:       val('f-dob'),
+      age:       val('f-age'),
+      sex:       val('f-sex'),
+      bloodGroup:val('f-blood'),
+      address:   val('f-addr'),
+      createdAt: id ? (d.patients.find(p=>p.id===id)||{}).createdAt : DB.today(),
+    };
+    if (id) { const i=d.patients.findIndex(x=>x.id===id); if(i>-1) d.patients[i]=p; }
+    else d.patients.push(p);
+  });
+  closeModal(); navigate('patients');
+  showToast(id?'Patient updated!':'Patient registered!','success');
+}
+
+/* ─── STAFF MANAGEMENT (generic helper) ─────────────────────── */
+function renderStaffPage(role, label, icon, fields=[]) {
+  if (SESSION.role !== 'admin') return `<div class="empty-state"><div class="es-icon">🔒</div><p>Admin access only.</p></div>`;
+  const d = DB.get();
+  const store = role+'s';
+  const staff = d[store] || [];
+  return `
+  <div class="page-header">
+    <div><h2>${icon} ${label}</h2><p>Manage ${label.toLowerCase()} accounts</p></div>
+    <button class="btn btn-primary" onclick="openStaffForm('${role}','')">+ Add ${label.slice(0,-1)||label}</button>
+  </div>
+  <div class="card"><div class="card-header"><h4>${label} (${staff.length})</h4></div>
+  <div class="card-body table-wrap"><table>
+    <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Department</th><th>Actions</th></tr></thead>
+    <tbody>${staff.length ? staff.map(s=>`<tr>
+      <td><code>${esc(s.id)}</code></td><td><strong>${esc(s.name)}</strong></td>
+      <td>${esc(s.email)}</td><td>${esc(s.phone)}</td>
+      <td>${esc(s.department||'—')}</td>
+      <td class="td-actions">
+        <button class="btn btn-sm btn-secondary" onclick="openStaffForm('${role}','${s.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteRecord('${store}','${s.id}','${label}')">Del</button>
+      </td>
+    </tr>`).join('') : `<tr><td colspan="6"><div class="empty-state"><div class="es-icon">${icon}</div><p>No ${label.toLowerCase()} added yet.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function renderDoctors()       { return renderStaffPage('doctor','Doctors','👨‍⚕️'); }
+function renderNurses()        { return renderStaffPage('nurse','Nurses','👩‍⚕️'); }
+function renderPharmacists()   { return renderStaffPage('pharmacist','Pharmacists','💊'); }
+function renderLaboratorists() { return renderStaffPage('laboratorist','Laboratorists','🔬'); }
+function renderAccountants()   { return renderStaffPage('accountant','Accountants','💼'); }
+
+function openStaffForm(role, id) {
+  const d = DB.get(); const store = role+'s';
+  const s = id ? (d[store]||[]).find(x=>x.id===id) : {};
+  const depts = d.departments;
+  openModal((id?'Edit ':'Add ') + role.charAt(0).toUpperCase()+role.slice(1), `
+  <div class="form-grid">
+    <div class="form-group full"><label>Full Name *</label><input class="form-control" id="f-name" value="${esc(s&&s.name||'')}"/></div>
+    <div class="form-group"><label>Email *</label><input class="form-control" id="f-email" type="email" value="${esc(s&&s.email||'')}"/></div>
+    <div class="form-group"><label>Password</label><input class="form-control" id="f-pass" type="password" value="${esc(s&&s.password||'')}" placeholder="Leave blank to keep"/></div>
+    <div class="form-group"><label>Phone</label><input class="form-control" id="f-phone" value="${esc(s&&s.phone||'')}"/></div>
+    <div class="form-group"><label>Address</label><input class="form-control" id="f-addr" value="${esc(s&&s.address||'')}"/></div>
+    ${role==='doctor'?`<div class="form-group"><label>Department</label>
+      <select class="form-control" id="f-dept">
+        <option value="">Select</option>
+        ${depts.map(dep=>`<option value="${esc(dep.id)}" ${(s&&s.departmentId)===dep.id?'selected':''}>${esc(dep.name)}</option>`).join('')}
+      </select></div>
+      <div class="form-group"><label>Qualification</label><input class="form-control" id="f-qual" value="${esc(s&&s.qualification||'')}"/></div>`:''}
+    <!-- ✏️  CUSTOMISE: Add extra fields per role here -->
+  </div>`, [
+    { label:id?'Save Changes':'Add Staff', cls:'btn-primary', action:()=>saveStaff(role,id) }
+  ]);
+}
+
+function saveStaff(role, id) {
+  const name = val('f-name'); if (!name) { showToast('Name required','error'); return; }
+  const email = val('f-email'); if (!email) { showToast('Email required','error'); return; }
+  DB.set(d=>{
+    const store = role+'s';
+    if (!d[store]) d[store]=[];
+    const existing = id ? d[store].find(x=>x.id===id) : null;
+    const s = {
+      id:           id || DB.uid(role.slice(0,3).toUpperCase()),
+      name, email,
+      password:     val('f-pass') || (existing&&existing.password) || 'password123',
+      phone:        val('f-phone'),
+      address:      val('f-addr'),
+      departmentId: el('f-dept') ? val('f-dept') : undefined,
+      qualification:el('f-qual') ? val('f-qual') : undefined,
+      createdAt:    existing ? existing.createdAt : DB.today(),
+    };
+    if (id) { const i=d[store].findIndex(x=>x.id===id); if(i>-1) d[store][i]=s; }
+    else d[store].push(s);
+  });
+  closeModal(); navigate(role+'s');
+  showToast(id?'Staff updated!':'Staff added!','success');
+}
+
+/* ─── DEPARTMENTS ────────────────────────────────────────────── */
+function renderDepartments() {
+  if (SESSION.role !== 'admin') return '';
+  const d = DB.get();
+  return `
+  <div class="page-header">
+    <div><h2>🏥 Departments</h2><p>Hospital department management</p></div>
+    <button class="btn btn-primary" onclick="openDeptForm()">+ Add Department</button>
+  </div>
+  <div class="card"><div class="card-body table-wrap"><table>
+    <thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Doctors</th><th>Actions</th></tr></thead>
+    <tbody>${d.departments.map(dep=>{
+      const docs = d.doctors.filter(doc=>doc.departmentId===dep.id).length;
+      return `<tr>
+        <td><code>${esc(dep.id)}</code></td>
+        <td><strong>${esc(dep.name)}</strong></td>
+        <td>${esc(dep.description||'—')}</td>
+        <td>${docs} doctor${docs!==1?'s':''}</td>
+        <td class="td-actions">
+          <button class="btn btn-sm btn-secondary" onclick="openDeptForm('${dep.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteRecord('departments','${dep.id}','Department')">Del</button>
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody></table></div></div>`;
+}
+
+function openDeptForm(id='') {
+  const d = DB.get(); const dep = id ? d.departments.find(x=>x.id===id) : {};
+  openModal(id?'Edit Department':'Add Department',`
+  <div class="form-group"><label>Name *</label><input class="form-control" id="f-name" value="${esc(dep&&dep.name||'')}"/></div>
+  <div class="form-group"><label>Description</label><textarea class="form-control" id="f-desc">${esc(dep&&dep.description||'')}</textarea></div>`,
+  [{label:id?'Save':'Add Department',cls:'btn-primary',action:()=>{
+    DB.set(d=>{
+      const name=val('f-name'); if(!name)return;
+      const dept={id:id||DB.uid('DEP'),name,description:val('f-desc')};
+      if(id){const i=d.departments.findIndex(x=>x.id===id);if(i>-1)d.departments[i]=dept;}
+      else d.departments.push(dept);
+    }); closeModal(); navigate('departments'); showToast('Department saved!','success');
+  }}]);
+}
+
+/* ─── BEDS ────────────────────────────────────────────────────── */
+function renderBeds() {
+  const d = DB.get(); const canEdit = ['admin','nurse','doctor'].includes(SESSION.role);
+  return `
+  <div class="page-header">
+    <div><h2>🛏️ Beds & Wards</h2><p>Bed management and allotment</p></div>
+    ${canEdit?`<div style="display:flex;gap:8px">
+      <button class="btn btn-secondary" onclick="openBedForm()">+ Add Bed</button>
+      <button class="btn btn-primary" onclick="openAllotmentForm()">Allot Bed</button>
+    </div>`:''}
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:20px">
+    ${CONFIG.bedTypes.map(t=>{
+      const count=d.beds.filter(b=>b.type===t).length;
+      const occ=d.beds.filter(b=>b.type===t&&b.status==='occupied').length;
+      return `<div class="stat-card"><div class="stat-label">${t}</div><div class="stat-value">${occ}/${count}</div><div class="stat-sub">Occupied/Total</div></div>`;
+    }).join('')}
+  </div>
+  <div class="card"><div class="card-header"><h4>All Beds (${d.beds.length})</h4></div>
+  <div class="card-body table-wrap"><table>
+    <thead><tr><th>Bed #</th><th>Type</th><th>Ward</th><th>Status</th><th>Patient</th>${canEdit?'<th>Actions</th>':''}</tr></thead>
+    <tbody>${d.beds.length?d.beds.map(b=>{
+      const allot=d.bedAllotments.find(a=>a.bedId===b.id&&!a.dischargedAt);
+      const pt=allot?d.patients.find(p=>p.id===allot.patientId):null;
+      return `<tr>
+        <td><strong>${esc(b.number)}</strong></td>
+        <td>${esc(b.type)}</td>
+        <td>${esc(b.ward||'—')}</td>
+        <td><span class="badge badge-${b.status==='available'?'success':'danger'}">${b.status||'available'}</span></td>
+        <td>${pt?esc(pt.name):'—'}</td>
+        ${canEdit?`<td class="td-actions">
+          <button class="btn btn-sm btn-secondary" onclick="openBedForm('${b.id}')">Edit</button>
+          ${pt?`<button class="btn btn-sm btn-warning" onclick="dischargePatient('${allot.id}','${b.id}')">Discharge</button>`:''}
+          <button class="btn btn-sm btn-danger" onclick="deleteRecord('beds','${b.id}','Bed')">Del</button>
+        </td>`:''}
+      </tr>`;
+    }).join(''):`<tr><td colspan="6"><div class="empty-state"><div class="es-icon">🛏️</div><p>No beds added yet.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function openBedForm(id='') {
+  const d=DB.get(); const b=id?d.beds.find(x=>x.id===id):{};
+  openModal(id?'Edit Bed':'Add Bed',`
+  <div class="form-grid">
+    <div class="form-group"><label>Bed Number *</label><input class="form-control" id="f-num" value="${esc(b&&b.number||'')}"/></div>
+    <div class="form-group"><label>Type</label>
+      <select class="form-control" id="f-type">${CONFIG.bedTypes.map(t=>`<option ${b&&b.type===t?'selected':''}>${t}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>Ward / Location</label><input class="form-control" id="f-ward" value="${esc(b&&b.ward||'')}"/></div>
+    <div class="form-group"><label>Status</label>
+      <select class="form-control" id="f-stat">
+        <option value="available" ${b&&b.status==='available'?'selected':''}>Available</option>
+        <option value="occupied" ${b&&b.status==='occupied'?'selected':''}>Occupied</option>
+        <option value="maintenance" ${b&&b.status==='maintenance'?'selected':''}>Maintenance</option>
+      </select>
+    </div>
+    <div class="form-group full"><label>Notes</label><textarea class="form-control" id="f-notes">${esc(b&&b.notes||'')}</textarea></div>
+  </div>`,[{label:id?'Save':'Add Bed',cls:'btn-primary',action:()=>{
+    DB.set(d=>{
+      const bed={id:id||DB.uid('BED'),number:val('f-num'),type:val('f-type'),ward:val('f-ward'),status:val('f-stat'),notes:val('f-notes')};
+      if(id){const i=d.beds.findIndex(x=>x.id===id);if(i>-1)d.beds[i]=bed;}else d.beds.push(bed);
+    }); closeModal(); navigate('beds'); showToast('Bed saved!','success');
+  }}]);
+}
+
+function openAllotmentForm() {
+  const d=DB.get();
+  const avail=d.beds.filter(b=>b.status==='available');
+  openModal('Allot Bed to Patient',`
+  <div class="form-group"><label>Patient *</label>
+    <select class="form-control" id="f-pat">
+      <option value="">Select patient</option>
+      ${d.patients.map(p=>`<option value="${p.id}">${esc(p.name)} (${esc(p.id)})</option>`).join('')}
+    </select>
+  </div>
+  <div class="form-group"><label>Available Bed *</label>
+    <select class="form-control" id="f-bed">
+      <option value="">Select bed</option>
+      ${avail.map(b=>`<option value="${b.id}">Bed ${esc(b.number)} – ${esc(b.type)} (${esc(b.ward||'General')})</option>`).join('')}
+    </select>
+  </div>
+  <div class="form-group"><label>Admission Date</label><input class="form-control" id="f-admit" type="date" value="${DB.today()}"/></div>
+  <div class="form-group"><label>Expected Discharge</label><input class="form-control" id="f-disch" type="date"/></div>
+  <div class="form-group"><label>Reason</label><textarea class="form-control" id="f-reason" placeholder="Reason for admission..."></textarea></div>
+  `,[{label:'Allot Bed',cls:'btn-primary',action:()=>{
+    const patId=val('f-pat'); const bedId=val('f-bed');
+    if(!patId||!bedId){showToast('Select patient and bed','error');return;}
+    DB.set(d=>{
+      d.bedAllotments.push({id:DB.uid('ALLOT'),bedId,patientId:patId,admitDate:val('f-admit'),expectedDischarge:val('f-disch'),reason:val('f-reason'),allottedAt:DB.today()});
+      const b=d.beds.find(b=>b.id===bedId); if(b) b.status='occupied';
+    }); closeModal(); navigate('beds'); showToast('Bed allotted!','success');
+  }}]);
+}
+
+function dischargePatient(allotId, bedId) {
+  if (!confirm('Discharge patient from this bed?')) return;
+  DB.set(d=>{
+    const a=d.bedAllotments.find(x=>x.id===allotId); if(a) a.dischargedAt=DB.today();
+    const b=d.beds.find(x=>x.id===bedId); if(b) b.status='available';
+  }); navigate('beds'); showToast('Patient discharged','success');
+}
+
+/* ─── APPOINTMENTS ───────────────────────────────────────────── */
+function renderAppointments() {
+  const d = DB.get();
+  let apts = d.appointments;
+  if (SESSION.role==='patient') apts=apts.filter(a=>a.patientId===SESSION.id);
+  if (SESSION.role==='doctor')  apts=apts.filter(a=>a.doctorId===SESSION.id);
+  const canCreate = ['admin','doctor','nurse','patient'].includes(SESSION.role);
+  return `
+  <div class="page-header">
+    <div><h2>📅 Appointments</h2><p>Schedule and manage appointments</p></div>
+    ${canCreate?`<button class="btn btn-primary" onclick="openAptForm()">+ New Appointment</button>`:''}
+  </div>
+  <div class="card"><div class="card-body table-wrap"><table>
+    <thead><tr><th>Date</th><th>Time</th><th>Patient</th><th>Doctor</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${apts.length?apts.sort((a,b)=>b.date.localeCompare(a.date)).map(a=>{
+      const pt=d.patients.find(p=>p.id===a.patientId)||{name:'Unknown'};
+      const dr=d.doctors.find(doc=>doc.id===a.doctorId)||{name:'—'};
+      return `<tr>
+        <td>${DB.fmt(a.date)}</td><td>${esc(a.time||'—')}</td>
+        <td><strong>${esc(pt.name)}</strong></td>
+        <td>Dr. ${esc(dr.name)}</td>
+        <td>${esc(a.reason||'—')}</td>
+        <td><span class="badge badge-${a.status==='completed'?'success':a.status==='cancelled'?'danger':'info'}">${a.status||'scheduled'}</span></td>
+        <td class="td-actions">
+          <button class="btn btn-sm btn-secondary" onclick="openAptForm('${a.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteRecord('appointments','${a.id}','Appointment')">Del</button>
+        </td>
+      </tr>`;
+    }).join(''):`<tr><td colspan="7"><div class="empty-state"><div class="es-icon">📅</div><p>No appointments found.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function openAptForm(id='') {
+  const d=DB.get(); const a=id?d.appointments.find(x=>x.id===id):{};
+  openModal(id?'Edit Appointment':'New Appointment',`
+  <div class="form-grid">
+    <div class="form-group"><label>Patient *</label>
+      <select class="form-control" id="f-pat">
+        <option value="">Select</option>
+        ${d.patients.map(p=>`<option value="${p.id}" ${a&&a.patientId===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Doctor *</label>
+      <select class="form-control" id="f-doc">
+        <option value="">Select</option>
+        ${d.doctors.map(doc=>`<option value="${doc.id}" ${a&&a.doctorId===doc.id?'selected':''}>Dr. ${esc(doc.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Date *</label><input class="form-control" id="f-date" type="date" value="${esc(a&&a.date||DB.today())}"/></div>
+    <div class="form-group"><label>Time</label><input class="form-control" id="f-time" type="time" value="${esc(a&&a.time||'')}"/></div>
+    <div class="form-group"><label>Status</label>
+      <select class="form-control" id="f-stat">
+        ${['scheduled','completed','cancelled'].map(s=>`<option ${a&&a.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group full"><label>Reason / Notes</label><textarea class="form-control" id="f-reason">${esc(a&&a.reason||'')}</textarea></div>
+    <!-- ✏️  CUSTOMISE: Add consultation fee field, etc. -->
+  </div>`,[{label:id?'Update':'Book Appointment',cls:'btn-primary',action:()=>{
+    const patId=val('f-pat'); const docId=val('f-doc'); const date=val('f-date');
+    if(!patId||!date){showToast('Patient and date required','error');return;}
+    DB.set(d=>{
+      const apt={id:id||DB.uid('APT'),patientId:patId,doctorId:docId,date,time:val('f-time'),reason:val('f-reason'),status:val('f-stat'),createdAt:DB.today()};
+      if(id){const i=d.appointments.findIndex(x=>x.id===id);if(i>-1)d.appointments[i]=apt;}
+      else d.appointments.push(apt);
+    }); closeModal(); navigate('appointments'); showToast(id?'Appointment updated!':'Appointment booked!','success');
+  }}]);
+}
+
+/* ─── PRESCRIPTIONS ─────────────────────────────────────────── */
+function renderPrescriptions() {
+  const d = DB.get();
+  let px = d.prescriptions;
+  if (SESSION.role==='patient') px=px.filter(p=>p.patientId===SESSION.id);
+  if (SESSION.role==='doctor')  px=px.filter(p=>p.doctorId===SESSION.id);
+  const canCreate = ['admin','doctor'].includes(SESSION.role);
+  return `
+  <div class="page-header">
+    <div><h2>📝 Prescriptions</h2><p>Manage patient prescriptions</p></div>
+    ${canCreate?`<button class="btn btn-primary" onclick="openPxForm()">+ New Prescription</button>`:''}
+  </div>
+  <div class="card"><div class="card-body table-wrap"><table>
+    <thead><tr><th>Rx #</th><th>Patient</th><th>Doctor</th><th>Date</th><th>Diagnosis</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${px.length?px.sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(p=>{
+      const pt=d.patients.find(x=>x.id===p.patientId)||{name:'Unknown'};
+      const dr=d.doctors.find(x=>x.id===p.doctorId)||{name:'—'};
+      return `<tr>
+        <td><code>${esc(p.id)}</code></td>
+        <td><strong>${esc(pt.name)}</strong></td>
+        <td>Dr. ${esc(dr.name)}</td>
+        <td>${DB.fmt(p.createdAt)}</td>
+        <td>${esc((p.diagnosis||'—').substring(0,40))}</td>
+        <td><span class="badge badge-${p.status==='dispensed'?'success':'info'}">${p.status||'pending'}</span></td>
+        <td class="td-actions">
+          <button class="btn btn-sm btn-secondary" onclick="viewPx('${p.id}')">View</button>
+          ${canCreate?`<button class="btn btn-sm btn-danger" onclick="deleteRecord('prescriptions','${p.id}','Prescription')">Del</button>`:''}
+        </td>
+      </tr>`;
+    }).join(''):`<tr><td colspan="7"><div class="empty-state"><div class="es-icon">📝</div><p>No prescriptions found.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function openPxForm(id='') {
+  const d=DB.get(); const p=id?d.prescriptions.find(x=>x.id===id):{};
+  openModal('New Prescription','modal-lg',`
+  <div class="form-grid">
+    <div class="form-group"><label>Patient *</label>
+      <select class="form-control" id="f-pat">
+        <option value="">Select</option>
+        ${d.patients.map(pt=>`<option value="${pt.id}" ${p&&p.patientId===pt.id?'selected':''}>${esc(pt.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Doctor</label>
+      <select class="form-control" id="f-doc">
+        <option value="">Select</option>
+        ${d.doctors.map(doc=>`<option value="${doc.id}" ${p&&p.doctorId===doc.id?'selected':''}>Dr. ${esc(doc.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group full"><label>Chief Complaint / Case History</label><textarea class="form-control" id="f-complaint">${esc(p&&p.complaint||'')}</textarea></div>
+    <div class="form-group full"><label>Diagnosis</label><textarea class="form-control" id="f-diagnosis">${esc(p&&p.diagnosis||'')}</textarea></div>
+    <div class="form-group full"><label>Medications (one per line: Drug – Dose – Frequency – Duration)</label><textarea class="form-control" id="f-meds" style="min-height:120px">${esc(p&&p.medications||'')}</textarea></div>
+    <div class="form-group full"><label>Lab Tests Requested</label>
+      <input class="form-control" id="f-labs" placeholder="e.g. Full Blood Count, Urinalysis" value="${esc(p&&p.labTests||'')}"/>
+    </div>
+    <div class="form-group full"><label>Doctor's Notes / Advice</label><textarea class="form-control" id="f-notes">${esc(p&&p.notes||'')}</textarea></div>
+    <div class="form-group"><label>Follow-up Date</label><input class="form-control" id="f-followup" type="date" value="${esc(p&&p.followupDate||'')}"/></div>
+    <div class="form-group"><label>Status</label>
+      <select class="form-control" id="f-stat">
+        ${['pending','dispensed','completed'].map(s=>`<option ${p&&p.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <!-- ✏️  CUSTOMISE: Add vital signs fields, allergies, etc. -->
+  </div>`,[{label:id?'Update':'Create Prescription',cls:'btn-primary',action:()=>savePx(id)}]);
+}
+
+function savePx(id) {
+  const patId=val('f-pat'); if(!patId){showToast('Select patient','error');return;}
+  DB.set(d=>{
+    const px={
+      id:id||DB.uid('RX'),patientId:patId,doctorId:val('f-doc'),
+      complaint:val('f-complaint'),diagnosis:val('f-diagnosis'),
+      medications:val('f-meds'),labTests:val('f-labs'),notes:val('f-notes'),
+      followupDate:val('f-followup'),status:val('f-stat'),createdAt:DB.today()
+    };
+    if(id){const i=d.prescriptions.findIndex(x=>x.id===id);if(i>-1)d.prescriptions[i]=px;}
+    else d.prescriptions.push(px);
+  }); closeModal(); navigate('prescriptions'); showToast('Prescription saved!','success');
+}
+
+function viewPx(id) {
+  const d=DB.get(); const p=d.prescriptions.find(x=>x.id===id); if(!p) return;
+  const pt=d.patients.find(x=>x.id===p.patientId)||{name:'Unknown',bloodGroup:'?'};
+  const dr=d.doctors.find(x=>x.id===p.doctorId)||{name:'—'};
+  openModal('Prescription — '+p.id,'modal-lg',`
+  <div style="padding:8px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+      <div><h3 style="font-family:var(--font-display);color:var(--brand-dark)">${CONFIG.facilityName}</h3>
+        <p style="font-size:.78rem;color:var(--neutral-500)">${CONFIG.facilityAddress} · ${CONFIG.facilityPhone}</p>
+      </div>
+      <div style="text-align:right"><div style="font-size:.75rem;color:var(--neutral-500)">Rx # ${p.id}</div>
+        <div style="font-size:.82rem">${DB.fmt(p.createdAt)}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;background:var(--neutral-50);padding:12px;border-radius:8px;margin-bottom:16px">
+      <div><span style="font-size:.7rem;color:var(--neutral-500);text-transform:uppercase">Patient</span><div style="font-weight:700">${esc(pt.name)}</div></div>
+      <div><span style="font-size:.7rem;color:var(--neutral-500);text-transform:uppercase">Blood Group</span><div>${esc(pt.bloodGroup)}</div></div>
+      <div><span style="font-size:.7rem;color:var(--neutral-500);text-transform:uppercase">Attending Doctor</span><div>Dr. ${esc(dr.name)}</div></div>
+      <div><span style="font-size:.7rem;color:var(--neutral-500);text-transform:uppercase">Follow-up</span><div>${DB.fmt(p.followupDate)||'—'}</div></div>
+    </div>
+    ${p.complaint?`<div style="margin-bottom:12px"><div style="font-weight:700;font-size:.82rem;text-transform:uppercase;color:var(--neutral-500);margin-bottom:4px">Chief Complaint</div><div>${esc(p.complaint)}</div></div>`:''}
+    ${p.diagnosis?`<div style="margin-bottom:12px"><div style="font-weight:700;font-size:.82rem;text-transform:uppercase;color:var(--neutral-500);margin-bottom:4px">Diagnosis</div><div style="font-weight:600;color:var(--brand-dark)">${esc(p.diagnosis)}</div></div>`:''}
+    ${p.medications?`<div style="margin-bottom:12px"><div style="font-weight:700;font-size:.82rem;text-transform:uppercase;color:var(--neutral-500);margin-bottom:8px">💊 Medications</div>
+      <div style="background:var(--brand-light);padding:12px;border-radius:8px;white-space:pre-line;font-size:.88rem">${esc(p.medications)}</div></div>`:''}
+    ${p.labTests?`<div style="margin-bottom:12px"><div style="font-weight:700;font-size:.82rem;text-transform:uppercase;color:var(--neutral-500);margin-bottom:4px">🔬 Lab Tests</div><div>${esc(p.labTests)}</div></div>`:''}
+    ${p.notes?`<div><div style="font-weight:700;font-size:.82rem;text-transform:uppercase;color:var(--neutral-500);margin-bottom:4px">Notes / Advice</div><div>${esc(p.notes)}</div></div>`:''}
+  </div>`,[
+    {label:'🖨️ Print',cls:'btn-secondary',action:()=>window.print()},
+    ...(SESSION.role==='doctor'?[{label:'Edit',cls:'btn-primary',action:()=>{closeModal();openPxForm(id);}}]:[])
+  ]);
+}
+
+/* ─── INVOICES ───────────────────────────────────────────────── */
+function renderInvoices() {
+  const d = DB.get();
+  let invs = d.invoices;
+  if (SESSION.role==='patient') invs=invs.filter(i=>i.patientId===SESSION.id);
+  const canCreate = ['admin','accountant'].includes(SESSION.role);
+  return `
+  <div class="page-header">
+    <div><h2>🧾 Invoices</h2><p>Billing management</p></div>
+    ${canCreate?`<button class="btn btn-primary" onclick="openInvoiceForm()">+ New Invoice</button>`:''}
+  </div>
+  <div class="card"><div class="card-body table-wrap"><table>
+    <thead><tr><th>Invoice #</th><th>Patient</th><th>Title</th><th>Amount</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${invs.length?invs.sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(inv=>{
+      const pt=d.patients.find(p=>p.id===inv.patientId)||{name:'Unknown'};
+      return `<tr>
+        <td><code>${esc(inv.id)}</code></td>
+        <td><strong>${esc(pt.name)}</strong></td>
+        <td>${esc(inv.title)}</td>
+        <td><strong>${formatCurrency(inv.amount)}</strong></td>
+        <td>${DB.fmt(inv.createdAt)}</td>
+        <td><span class="badge badge-${inv.status==='paid'?'success':inv.status==='partial'?'warning':'danger'}">${inv.status||'unpaid'}</span></td>
+        <td class="td-actions">
+          <button class="btn btn-sm btn-secondary" onclick="viewInvoice('${inv.id}')">View</button>
+          ${canCreate&&inv.status!=='paid'?`<button class="btn btn-sm btn-success" onclick="markPaid('${inv.id}')">Pay</button>`:''}
+          ${canCreate?`<button class="btn btn-sm btn-danger" onclick="deleteRecord('invoices','${inv.id}','Invoice')">Del</button>`:''}
+        </td>
+      </tr>`;
+    }).join(''):`<tr><td colspan="7"><div class="empty-state"><div class="es-icon">🧾</div><p>No invoices found.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function openInvoiceForm(id='') {
+  const d=DB.get(); const inv=id?d.invoices.find(x=>x.id===id):{};
+  openModal(id?'Edit Invoice':'New Invoice',`
+  <div class="form-grid">
+    <div class="form-group full"><label>Patient *</label>
+      <select class="form-control" id="f-pat">
+        <option value="">Select patient</option>
+        ${d.patients.map(p=>`<option value="${p.id}" ${inv&&inv.patientId===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group full"><label>Invoice Title *</label><input class="form-control" id="f-title" value="${esc(inv&&inv.title||'')}" placeholder="e.g. Consultation Fee, Lab Tests, Medication..."/></div>
+    <div class="form-group full"><label>Description</label><textarea class="form-control" id="f-desc">${esc(inv&&inv.description||'')}</textarea></div>
+    <div class="form-group"><label>Amount (${getCurrency()}) *</label><input class="form-control" id="f-amount" type="number" step="0.01" value="${esc(inv&&inv.amount||'')}"/></div>
+    <div class="form-group"><label>Status</label>
+      <select class="form-control" id="f-stat">
+        ${['unpaid','partial','paid'].map(s=>`<option ${inv&&inv.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <!-- ✏️  CUSTOMISE: Add tax rate, discount, service codes, etc. -->
+  </div>`,[{label:id?'Update':'Create Invoice',cls:'btn-primary',action:()=>{
+    const patId=val('f-pat'); const title=val('f-title'); const amount=val('f-amount');
+    if(!patId||!title||!amount){showToast('Fill required fields','error');return;}
+    DB.set(d=>{
+      const inv2={id:id||DB.uid('INV'),patientId:patId,title,description:val('f-desc'),amount:parseFloat(amount),status:val('f-stat'),createdAt:DB.today()};
+      if(id){const i=d.invoices.findIndex(x=>x.id===id);if(i>-1)d.invoices[i]=inv2;}
+      else d.invoices.push(inv2);
+    }); closeModal(); navigate('invoices'); showToast('Invoice saved!','success');
+  }}]);
+}
+
+function markPaid(id) {
+  const d=DB.get(); const inv=d.invoices.find(x=>x.id===id); if(!inv) return;
+  const pt=d.patients.find(p=>p.id===inv.patientId)||{name:'Unknown'};
+  openModal('Record Payment',`
+  <div style="background:var(--neutral-50);padding:12px;border-radius:8px;margin-bottom:16px">
+    <div style="font-size:.75rem;color:var(--neutral-500)">Invoice</div>
+    <div><strong>${esc(inv.title)}</strong> — ${esc(pt.name)}</div>
+    <div style="font-size:1.2rem;font-weight:700;color:var(--brand-primary)">${formatCurrency(inv.amount)}</div>
+  </div>
+  <div class="form-group"><label>Payment Method</label>
+    <select class="form-control" id="f-method">
+      ${['Cash','Card','Mobile Money','Bank Transfer','Insurance','Other'].map(m=>`<option>${m}</option>`).join('')}
+    </select>
+  </div>
+  <div class="form-group"><label>Amount Received</label><input class="form-control" id="f-amt" type="number" value="${inv.amount}"/></div>
+  <div class="form-group"><label>Notes</label><input class="form-control" id="f-notes" placeholder="Transaction ID, reference, etc."/></div>
+  <!-- ✏️  CUSTOMISE: Add receipt number, cashier, etc. -->
+  `,[{label:'Confirm Payment',cls:'btn-success',action:()=>{
+    DB.set(d=>{
+      d.payments.push({id:DB.uid('PAY'),invoiceId:id,patientId:inv.patientId,method:val('f-method'),amount:parseFloat(val('f-amt')||inv.amount),notes:val('f-notes'),paidAt:DB.today()});
+      const inv2=d.invoices.find(x=>x.id===id); if(inv2) inv2.status='paid';
+    }); closeModal(); navigate('invoices'); showToast('Payment recorded!','success');
+  }}]);
+}
+
+function viewInvoice(id) {
+  const d=DB.get(); const inv=d.invoices.find(x=>x.id===id); if(!inv) return;
+  const pt=d.patients.find(p=>p.id===inv.patientId)||{name:'Unknown',address:''};
+  openModal('Invoice — '+id,'modal-lg',`
+  <div style="padding:8px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:20px">
+      <div><h3 style="font-family:var(--font-display);color:var(--brand-dark);font-size:1.4rem">${CONFIG.facilityName}</h3>
+        <div style="font-size:.78rem;color:var(--neutral-500)">${CONFIG.facilityAddress}</div>
+        <div style="font-size:.78rem;color:var(--neutral-500)">${CONFIG.facilityPhone} · ${CONFIG.facilityEmail}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:1.5rem;font-weight:700;color:var(--brand-primary)">INVOICE</div>
+        <div style="font-size:.82rem;color:var(--neutral-500)"># ${id}</div>
+        <div style="font-size:.82rem">${DB.fmt(inv.createdAt)}</div>
+        <span class="badge badge-${inv.status==='paid'?'success':inv.status==='partial'?'warning':'danger'}" style="margin-top:8px">${(inv.status||'unpaid').toUpperCase()}</span>
+      </div>
+    </div>
+    <div style="background:var(--neutral-50);padding:12px;border-radius:8px;margin-bottom:20px">
+      <div style="font-size:.7rem;color:var(--neutral-500);text-transform:uppercase;margin-bottom:4px">Billed To</div>
+      <div style="font-weight:700">${esc(pt.name)}</div>
+      <div style="font-size:.82rem;color:var(--neutral-500)">${esc(pt.address||'—')}</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+      <thead><tr style="background:var(--brand-dark);color:#fff">
+        <th style="padding:10px 14px;text-align:left">Description</th>
+        <th style="padding:10px 14px;text-align:right">Amount</th>
+      </tr></thead>
+      <tbody><tr><td style="padding:12px 14px;border-bottom:1px solid var(--neutral-200)">${esc(inv.title)}<br><small style="color:var(--neutral-500)">${esc(inv.description||'')}</small></td>
+        <td style="padding:12px 14px;text-align:right;font-weight:700;border-bottom:1px solid var(--neutral-200)">${formatCurrency(inv.amount)}</td>
+      </tr></tbody>
+      <tfoot><tr><td style="padding:12px 14px;text-align:right;font-weight:700;font-size:1.1rem">Total</td>
+        <td style="padding:12px 14px;text-align:right;font-weight:700;font-size:1.2rem;color:var(--brand-primary)">${formatCurrency(inv.amount)}</td>
+      </tr></tfoot>
+    </table>
+    <div style="font-size:.75rem;color:var(--neutral-500);text-align:center">Thank you for choosing ${CONFIG.facilityName}</div>
+  </div>`,[{label:'🖨️ Print Invoice',cls:'btn-secondary',action:()=>window.print()}]);
+}
+
+/* ─── PAYMENTS ───────────────────────────────────────────────── */
+function renderPayments() {
+  const d = DB.get();
+  const total = d.payments.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  return `
+  <div class="page-header"><div><h2>💳 Payments</h2><p>Payment history and records</p></div>
+    <div class="topbar-badge">Total Collected: ${formatCurrency(total)}</div>
+  </div>
+  <div class="card"><div class="card-body table-wrap"><table>
+    <thead><tr><th>Pay ID</th><th>Patient</th><th>Invoice</th><th>Method</th><th>Amount</th><th>Date</th><th>Notes</th></tr></thead>
+    <tbody>${d.payments.length?d.payments.sort((a,b)=>b.paidAt.localeCompare(a.paidAt)).map(p=>{
+      const pt=d.patients.find(x=>x.id===p.patientId)||{name:'Unknown'};
+      return `<tr>
+        <td><code>${esc(p.id)}</code></td>
+        <td>${esc(pt.name)}</td>
+        <td><code>${esc(p.invoiceId)}</code></td>
+        <td>${esc(p.method)}</td>
+        <td><strong>${formatCurrency(p.amount)}</strong></td>
+        <td>${DB.fmt(p.paidAt)}</td>
+        <td>${esc(p.notes||'—')}</td>
+      </tr>`;
+    }).join(''):`<tr><td colspan="7"><div class="empty-state"><div class="es-icon">💳</div><p>No payments recorded yet.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+/* ─── MEDICINES ─────────────────────────────────────────────── */
+function renderMedicines() {
+  const d = DB.get(); const canEdit=['admin','pharmacist'].includes(SESSION.role);
+  return `
+  <div class="page-header">
+    <div><h2>💊 Medicine Stock</h2><p>Pharmacy inventory</p></div>
+    ${canEdit?`<button class="btn btn-primary" onclick="openMedForm()">+ Add Medicine</button>`:''}
+  </div>
+  <div class="card"><div class="card-header"><h4>Medicines (${d.medicines.length})</h4>
+    <div class="search-bar" style="margin:0"><input class="search-input" placeholder="Search..." oninput="filterTable(this,'meds-tbody')"/></div>
+  </div><div class="card-body table-wrap"><table>
+    <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Company</th><th>Status</th>${canEdit?'<th>Actions</th>':''}</tr></thead>
+    <tbody id="meds-tbody">${d.medicines.length?d.medicines.map(m=>{
+      const cat=d.medicineCategories.find(c=>c.id===m.categoryId)||{name:'—'};
+      const stock=parseInt(m.stock||0);
+      return `<tr>
+        <td><strong>${esc(m.name)}</strong></td><td>${esc(cat.name)}</td>
+        <td>${formatCurrency(m.price)}</td><td>${stock}</td>
+        <td>${esc(m.company||'—')}</td>
+        <td><span class="badge badge-${stock<1?'danger':stock<10?'warning':'success'}">${stock<1?'Out of Stock':stock<10?'Low Stock':'In Stock'}</span></td>
+        ${canEdit?`<td class="td-actions">
+          <button class="btn btn-sm btn-secondary" onclick="openMedForm('${m.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteRecord('medicines','${m.id}','Medicine')">Del</button>
+        </td>`:''}
+      </tr>`;
+    }).join(''):`<tr><td colspan="7"><div class="empty-state"><div class="es-icon">💊</div><p>No medicines added yet.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function openMedForm(id='') {
+  const d=DB.get(); const m=id?d.medicines.find(x=>x.id===id):{};
+  openModal(id?'Edit Medicine':'Add Medicine',`
+  <div class="form-grid">
+    <div class="form-group full"><label>Medicine Name *</label><input class="form-control" id="f-name" value="${esc(m&&m.name||'')}"/></div>
+    <div class="form-group"><label>Category</label>
+      <select class="form-control" id="f-cat">
+        <option value="">None</option>
+        ${d.medicineCategories.map(c=>`<option value="${c.id}" ${m&&m.categoryId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Price (${getCurrency()})</label><input class="form-control" id="f-price" type="number" step="0.01" value="${esc(m&&m.price||'')}"/></div>
+    <div class="form-group"><label>Stock (units)</label><input class="form-control" id="f-stock" type="number" value="${esc(m&&m.stock||'0')}"/></div>
+    <div class="form-group"><label>Manufacturing Company</label><input class="form-control" id="f-company" value="${esc(m&&m.company||'')}"/></div>
+    <div class="form-group"><label>Expiry Date</label><input class="form-control" id="f-expiry" type="date" value="${esc(m&&m.expiry||'')}"/></div>
+    <div class="form-group full"><label>Description / Instructions</label><textarea class="form-control" id="f-desc">${esc(m&&m.description||'')}</textarea></div>
+    <!-- ✏️  CUSTOMISE: Add batch number, supplier, reorder level, etc. -->
+  </div>`,[{label:id?'Update':'Add Medicine',cls:'btn-primary',action:()=>{
+    const name=val('f-name'); if(!name){showToast('Name required','error');return;}
+    DB.set(d=>{
+      const med={id:id||DB.uid('MED'),name,categoryId:val('f-cat'),price:parseFloat(val('f-price')||0),stock:parseInt(val('f-stock')||0),company:val('f-company'),expiry:val('f-expiry'),description:val('f-desc')};
+      if(id){const i=d.medicines.findIndex(x=>x.id===id);if(i>-1)d.medicines[i]=med;}else d.medicines.push(med);
+    }); closeModal(); navigate('medicines'); showToast('Medicine saved!','success');
+  }}]);
+}
+
+function renderMedCats() {
+  const d=DB.get(); const canEdit=['admin','pharmacist'].includes(SESSION.role);
+  return `
+  <div class="page-header"><div><h2>🗂️ Medicine Categories</h2></div>
+    ${canEdit?`<button class="btn btn-primary" onclick="openMedCatForm()">+ Add Category</button>`:''}
+  </div>
+  <div class="card"><div class="card-body table-wrap"><table>
+    <thead><tr><th>Category</th><th>Description</th><th>Medicines</th>${canEdit?'<th>Actions</th>':''}</tr></thead>
+    <tbody>${d.medicineCategories.length?d.medicineCategories.map(c=>`<tr>
+      <td><strong>${esc(c.name)}</strong></td><td>${esc(c.description||'—')}</td>
+      <td>${d.medicines.filter(m=>m.categoryId===c.id).length}</td>
+      ${canEdit?`<td class="td-actions">
+        <button class="btn btn-sm btn-secondary" onclick="openMedCatForm('${c.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteRecord('medicineCategories','${c.id}','Category')">Del</button>
+      </td>`:''}
+    </tr>`).join(''):`<tr><td colspan="4"><div class="empty-state"><div class="es-icon">🗂️</div><p>No categories yet.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function openMedCatForm(id='') {
+  const d=DB.get(); const c=id?d.medicineCategories.find(x=>x.id===id):{};
+  openModal(id?'Edit Category':'Add Category',`
+  <div class="form-group"><label>Name *</label><input class="form-control" id="f-name" value="${esc(c&&c.name||'')}"/></div>
+  <div class="form-group"><label>Description</label><textarea class="form-control" id="f-desc">${esc(c&&c.description||'')}</textarea></div>
+  `,[{label:id?'Update':'Add',cls:'btn-primary',action:()=>{
+    const name=val('f-name'); if(!name){showToast('Name required','error');return;}
+    DB.set(d=>{
+      const cat={id:id||DB.uid('CAT'),name,description:val('f-desc')};
+      if(id){const i=d.medicineCategories.findIndex(x=>x.id===id);if(i>-1)d.medicineCategories[i]=cat;}
+      else d.medicineCategories.push(cat);
+    }); closeModal(); navigate('med-cats'); showToast('Category saved!','success');
+  }}]);
+}
+
+/* ─── LAB RESULTS ────────────────────────────────────────────── */
+function renderLabResults() {
+  const d = DB.get();
+  let results = d.labResults;
+  if (SESSION.role==='patient') results=results.filter(r=>r.patientId===SESSION.id);
+  const canCreate=['admin','laboratorist','doctor'].includes(SESSION.role);
+  return `
+  <div class="page-header">
+    <div><h2>🔬 Lab Results</h2><p>Laboratory test results</p></div>
+    ${canCreate?`<button class="btn btn-primary" onclick="openLabForm()">+ Add Result</button>`:''}
+  </div>
+  <div class="card"><div class="card-body table-wrap"><table>
+    <thead><tr><th>Result ID</th><th>Patient</th><th>Test</th><th>Result</th><th>Date</th><th>Status</th>${canCreate?'<th>Actions</th>':''}</tr></thead>
+    <tbody>${results.length?results.sort((a,b)=>b.date.localeCompare(a.date)).map(r=>{
+      const pt=d.patients.find(p=>p.id===r.patientId)||{name:'Unknown'};
+      return `<tr>
+        <td><code>${esc(r.id)}</code></td>
+        <td><strong>${esc(pt.name)}</strong></td>
+        <td>${esc(r.testName)}</td>
+        <td>${esc(r.result)}</td>
+        <td>${DB.fmt(r.date)}</td>
+        <td><span class="badge badge-${r.status==='normal'?'success':r.status==='abnormal'?'danger':'warning'}">${r.status||'pending'}</span></td>
+        ${canCreate?`<td class="td-actions">
+          <button class="btn btn-sm btn-secondary" onclick="openLabForm('${r.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteRecord('labResults','${r.id}','Result')">Del</button>
+        </td>`:''}
+      </tr>`;
+    }).join(''):`<tr><td colspan="7"><div class="empty-state"><div class="es-icon">🔬</div><p>No lab results yet.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function openLabForm(id='') {
+  const d=DB.get(); const r=id?d.labResults.find(x=>x.id===id):{};
+  openModal(id?'Edit Lab Result':'Add Lab Result',`
+  <div class="form-grid">
+    <div class="form-group"><label>Patient *</label>
+      <select class="form-control" id="f-pat">
+        <option value="">Select</option>
+        ${d.patients.map(p=>`<option value="${p.id}" ${r&&r.patientId===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Test Name *</label>
+      <input list="test-list" class="form-control" id="f-test" value="${esc(r&&r.testName||'')}" placeholder="Type or select"/>
+      <datalist id="test-list">${CONFIG.labTests.map(t=>`<option>${t}</option>`).join('')}</datalist>
+    </div>
+    <div class="form-group full"><label>Result *</label><textarea class="form-control" id="f-result">${esc(r&&r.result||'')}</textarea></div>
+    <div class="form-group"><label>Reference Range</label><input class="form-control" id="f-ref" value="${esc(r&&r.referenceRange||'')}" placeholder="e.g. 4.0–11.0 × 10⁹/L"/></div>
+    <div class="form-group"><label>Status</label>
+      <select class="form-control" id="f-stat">
+        ${['pending','normal','abnormal','critical'].map(s=>`<option ${r&&r.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Test Date</label><input class="form-control" id="f-date" type="date" value="${esc(r&&r.date||DB.today())}"/></div>
+    <div class="form-group full"><label>Notes</label><textarea class="form-control" id="f-notes">${esc(r&&r.notes||'')}</textarea></div>
+    <!-- ✏️  CUSTOMISE: Add lab technician signature, machine ID, etc. -->
+  </div>`,[{label:id?'Update':'Save Result',cls:'btn-primary',action:()=>{
+    const patId=val('f-pat'); const test=val('f-test'); const result=val('f-result');
+    if(!patId||!test||!result){showToast('Fill required fields','error');return;}
+    DB.set(d=>{
+      const lab={id:id||DB.uid('LAB'),patientId:patId,testName:test,result,referenceRange:val('f-ref'),status:val('f-stat'),date:val('f-date'),notes:val('f-notes')};
+      if(id){const i=d.labResults.findIndex(x=>x.id===id);if(i>-1)d.labResults[i]=lab;}else d.labResults.push(lab);
+    }); closeModal(); navigate('lab-results'); showToast('Lab result saved!','success');
+  }}]);
+}
+
+/* ─── BLOOD BANK ─────────────────────────────────────────────── */
+function renderBloodBank() {
+  const d=DB.get(); const canEdit=['admin','laboratorist'].includes(SESSION.role);
+  const bloodData = CONFIG.bloodGroups.map(bg=>({
+    group:bg, donors:d.bloodDonors.filter(x=>x.bloodGroup===bg).length
+  }));
+  return `
+  <div class="page-header"><div><h2>🩸 Blood Bank</h2><p>Blood group availability and donors</p></div></div>
+  <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+    ${bloodData.map(b=>`<div class="stat-card">
+      <div class="blood-pill" style="width:44px;height:44px;font-size:1rem">${b.group}</div>
+      <div class="stat-label">Donors</div>
+      <div class="stat-value">${b.donors}</div>
+    </div>`).join('')}
+  </div>
+  <div class="card"><div class="card-header"><h4>Recent Blood Donors</h4>
+    ${canEdit?`<button class="btn btn-primary btn-sm" onclick="navigate('blood-donors')">Manage Donors</button>`:''}
+  </div><div class="card-body table-wrap"><table>
+    <thead><tr><th>Name</th><th>Blood Group</th><th>Phone</th><th>Last Donation</th></tr></thead>
+    <tbody>${d.bloodDonors.slice(0,10).map(donor=>`<tr>
+      <td><strong>${esc(donor.name)}</strong></td>
+      <td><span class="blood-pill">${esc(donor.bloodGroup)}</span></td>
+      <td>${esc(donor.phone)}</td>
+      <td>${DB.fmt(donor.lastDonation)}</td>
+    </tr>`).join('')||`<tr><td colspan="4"><div class="empty-state"><div class="es-icon">🩸</div><p>No donors registered.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function renderBloodDonors() {
+  const d=DB.get(); const canEdit=['admin','laboratorist'].includes(SESSION.role);
+  return `
+  <div class="page-header"><div><h2>🫀 Blood Donors</h2></div>
+    ${canEdit?`<button class="btn btn-primary" onclick="openDonorForm()">+ Add Donor</button>`:''}
+  </div>
+  <div class="card"><div class="card-body table-wrap"><table>
+    <thead><tr><th>Name</th><th>Blood</th><th>Age/Sex</th><th>Phone</th><th>Email</th><th>Last Donation</th>${canEdit?'<th>Actions</th>':''}</tr></thead>
+    <tbody>${d.bloodDonors.length?d.bloodDonors.map(donor=>`<tr>
+      <td><strong>${esc(donor.name)}</strong></td>
+      <td><span class="blood-pill">${esc(donor.bloodGroup)}</span></td>
+      <td>${esc(donor.age||'?')}y / ${esc(donor.sex||'—')}</td>
+      <td>${esc(donor.phone)}</td><td>${esc(donor.email||'—')}</td>
+      <td>${DB.fmt(donor.lastDonation)}</td>
+      ${canEdit?`<td class="td-actions">
+        <button class="btn btn-sm btn-secondary" onclick="openDonorForm('${donor.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteRecord('bloodDonors','${donor.id}','Donor')">Del</button>
+      </td>`:''}
+    </tr>`).join(''):`<tr><td colspan="7"><div class="empty-state"><div class="es-icon">🫀</div><p>No donors yet.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function openDonorForm(id='') {
+  const d=DB.get(); const donor=id?d.bloodDonors.find(x=>x.id===id):{};
+  openModal(id?'Edit Donor':'Add Blood Donor',`
+  <div class="form-grid">
+    <div class="form-group full"><label>Full Name *</label><input class="form-control" id="f-name" value="${esc(donor&&donor.name||'')}"/></div>
+    <div class="form-group"><label>Blood Group *</label>
+      <select class="form-control" id="f-blood">
+        ${CONFIG.bloodGroups.map(b=>`<option ${donor&&donor.bloodGroup===b?'selected':''}>${b}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Sex</label>
+      <select class="form-control" id="f-sex">
+        ${['Male','Female','Other'].map(s=>`<option ${donor&&donor.sex===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Age</label><input class="form-control" id="f-age" type="number" value="${esc(donor&&donor.age||'')}"/></div>
+    <div class="form-group"><label>Phone</label><input class="form-control" id="f-phone" value="${esc(donor&&donor.phone||'')}"/></div>
+    <div class="form-group"><label>Email</label><input class="form-control" id="f-email" type="email" value="${esc(donor&&donor.email||'')}"/></div>
+    <div class="form-group"><label>Last Donation</label><input class="form-control" id="f-last" type="date" value="${esc(donor&&donor.lastDonation||'')}"/></div>
+    <div class="form-group full"><label>Address</label><input class="form-control" id="f-addr" value="${esc(donor&&donor.address||'')}"/></div>
+  </div>`,[{label:id?'Update':'Add Donor',cls:'btn-primary',action:()=>{
+    const name=val('f-name'); if(!name){showToast('Name required','error');return;}
+    DB.set(d=>{
+      const donor2={id:id||DB.uid('DON'),name,bloodGroup:val('f-blood'),sex:val('f-sex'),age:val('f-age'),phone:val('f-phone'),email:val('f-email'),lastDonation:val('f-last'),address:val('f-addr')};
+      if(id){const i=d.bloodDonors.findIndex(x=>x.id===id);if(i>-1)d.bloodDonors[i]=donor2;}
+      else d.bloodDonors.push(donor2);
+    }); closeModal(); navigate('blood-donors'); showToast('Donor saved!','success');
+  }}]);
+}
+
+/* ─── REPORTS ────────────────────────────────────────────────── */
+function renderReports() {
+  const d=DB.get();
+  return `
+  <div class="page-header"><div><h2>📈 Reports</h2><p>Clinical event records</p></div>
+    <button class="btn btn-primary" onclick="openReportForm()">+ Add Report</button>
+  </div>
+  <div class="card"><div class="card-body table-wrap"><table>
+    <thead><tr><th>ID</th><th>Type</th><th>Patient</th><th>Date</th><th>Description</th><th>Actions</th></tr></thead>
+    <tbody>${(d.reports||[]).length?d.reports.map(r=>{
+      const pt=d.patients.find(p=>p.id===r.patientId)||{name:'—'};
+      return `<tr>
+        <td><code>${esc(r.id)}</code></td>
+        <td><span class="badge badge-info">${esc(r.type)}</span></td>
+        <td>${esc(pt.name)}</td><td>${DB.fmt(r.date)}</td>
+        <td>${esc((r.description||'—').substring(0,50))}</td>
+        <td><button class="btn btn-sm btn-danger" onclick="deleteRecord('reports','${r.id}','Report')">Del</button></td>
+      </tr>`;
+    }).join(''):`<tr><td colspan="6"><div class="empty-state"><div class="es-icon">📈</div><p>No reports recorded.</p></div></td></tr>`}
+    </tbody></table></div></div>`;
+}
+
+function openReportForm() {
+  const d=DB.get();
+  openModal('Add Clinical Report',`
+  <div class="form-grid">
+    <div class="form-group"><label>Type</label>
+      <select class="form-control" id="f-type">
+        ${['Birth','Death','Operation','Discharge','Transfer','Other'].map(t=>`<option>${t}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Patient</label>
+      <select class="form-control" id="f-pat">
+        <option value="">Select</option>
+        ${d.patients.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Date</label><input class="form-control" id="f-date" type="date" value="${DB.today()}"/></div>
+    <div class="form-group full"><label>Description</label><textarea class="form-control" id="f-desc"></textarea></div>
+  </div>`,[{label:'Save Report',cls:'btn-primary',action:()=>{
+    DB.set(d=>{
+      if(!d.reports) d.reports=[];
+      d.reports.push({id:DB.uid('REP'),type:val('f-type'),patientId:val('f-pat'),date:val('f-date'),description:val('f-desc')});
+    }); closeModal(); navigate('reports'); showToast('Report saved!','success');
+  }}]);
+}
+
+/* ─── NOTICEBOARD ───────────────────────────────────────────── */
+function renderNoticeboard() {
+  const d=DB.get(); const isAdmin=SESSION.role==='admin';
+  return `
+  <div class="page-header">
+    <div><h2>📢 Noticeboard</h2><p>Announcements for all staff</p></div>
+    ${isAdmin?`<button class="btn btn-primary" onclick="openNoticeForm()">+ Add Notice</button>`:''}
+  </div>
+  <div>
+    ${d.noticeboard.length ? d.noticeboard.map(n=>`
+      <div class="notice-item" style="margin-bottom:12px;border-radius:var(--radius)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <h5>${esc(n.title)}</h5>
+          ${isAdmin?`<div class="td-actions">
+            <button class="btn btn-sm btn-secondary" onclick="openNoticeForm('${n.id}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteRecord('noticeboard','${n.id}','Notice')">Del</button>
+          </div>`:''}
+        </div>
+        <p style="margin:6px 0">${esc(n.notice)}</p>
+        <span>${DB.fmt(n.date)}</span>
+      </div>`).join('') : `<div class="empty-state"><div class="es-icon">📢</div><p>No notices posted yet.</p></div>`}
+  </div>`;
+}
+
+function openNoticeForm(id='') {
+  const d=DB.get(); const n=id?d.noticeboard.find(x=>x.id===id):{};
+  openModal(id?'Edit Notice':'Add Notice',`
+  <div class="form-group"><label>Title *</label><input class="form-control" id="f-title" value="${esc(n&&n.title||'')}"/></div>
+  <div class="form-group"><label>Notice *</label><textarea class="form-control" id="f-notice" style="min-height:120px">${esc(n&&n.notice||'')}</textarea></div>
+  <div class="form-group"><label>Date</label><input class="form-control" id="f-date" type="date" value="${esc(n&&n.date||DB.today())}"/></div>
+  `,[{label:id?'Update':'Post Notice',cls:'btn-primary',action:()=>{
+    const title=val('f-title'); if(!title){showToast('Title required','error');return;}
+    DB.set(d=>{
+      const notice={id:id||DB.uid('NOT'),title,notice:val('f-notice'),date:val('f-date')};
+      if(id){const i=d.noticeboard.findIndex(x=>x.id===id);if(i>-1)d.noticeboard[i]=notice;}
+      else d.noticeboard.push(notice);
+    }); closeModal(); navigate('noticeboard'); showToast('Notice saved!','success');
+  }}]);
+}
+
+/* ─── SETTINGS ───────────────────────────────────────────────── */
+function renderSettings() {
+  if(SESSION.role!=='admin') return `<div class="empty-state"><div class="es-icon">🔒</div><p>Admin only.</p></div>`;
+  const d=DB.get(); const s=d.settings||{};
+  return `
+  <div class="page-header"><div><h2>⚙️ System Settings</h2><p>Configure your facility information</p></div></div>
+  <div class="card"><div class="card-header"><h4>Facility Information</h4></div>
+  <div class="card-body">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Facility Name</label>
+        <input class="form-control" id="s-name" value="${esc(s.facilityName||CONFIG.facilityName)}"/>
+        <div class="form-help">✏️ This appears on invoices, prescriptions, and all headers.</div>
+      </div>
+      <div class="form-group full"><label>Address</label><textarea class="form-control" id="s-addr">${esc(s.facilityAddress||CONFIG.facilityAddress)}</textarea></div>
+      <div class="form-group"><label>Phone</label><input class="form-control" id="s-phone" value="${esc(s.facilityPhone||CONFIG.facilityPhone)}"/></div>
+      <div class="form-group"><label>Email</label><input class="form-control" id="s-email" type="email" value="${esc(s.facilityEmail||CONFIG.facilityEmail)}"/></div>
+      <!-- ✏️  CUSTOMISE: Add currency, timezone, logo, etc. -->
+    </div>
+    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+  </div></div>
+
+  <div class="card" style="margin-top:20px"><div class="card-header"><h4>🔴 Data Management</h4></div>
+  <div class="card-body">
+    <p style="font-size:.88rem;color:var(--neutral-500);margin-bottom:16px">Export or clear system data. All data is stored in your browser's LocalStorage.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="exportData()">📥 Export Data (JSON)</button>
+      <button class="btn btn-secondary" onclick="importData()">📤 Import Data (JSON)</button>
+      <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+    </div>
+    <div class="form-help" style="margin-top:12px">⚠️ Clearing data cannot be undone. Always export a backup first.</div>
+  </div></div>
+
+  <div class="card" style="margin-top:20px"><div class="card-header"><h4>ℹ️ Developer Guide</h4></div>
+  <div class="card-body" style="font-size:.85rem;line-height:1.7;color:var(--neutral-700)">
+    <p><strong>Customisation Checklist:</strong></p>
+    <ul style="margin:8px 0 0 18px">
+      <li>Change <code>CONFIG</code> object at top of JS for departments, facility name, etc.</li>
+      <li>Change <code>DEFAULT_ACCOUNTS</code> to set staff login credentials.</li>
+      <li>Search for <code>✏️ CUSTOMISE</code> comments throughout the code to find editable sections.</li>
+      <li>Add more fields to any form by following the existing pattern in the form renderers.</li>
+      <li>To connect a real backend (Firebase, Supabase), replace <code>DB.set()</code> and <code>DB.get()</code> calls with API calls.</li>
+      <li>Currency: Edit <code>getCurrency()</code> function below.</li>
+      <li>To add a new role, add entries to <code>NAV</code>, <code>DEFAULT_ACCOUNTS</code>, and create a dashboard renderer.</li>
+    </ul>
+  </div></div>`;
+}
+
+function saveSettings() {
+  DB.set(d=>{
+    d.settings={
+      facilityName:    val('s-name'),
+      facilityAddress: val('s-addr'),
+      facilityPhone:   val('s-phone'),
+      facilityEmail:   val('s-email'),
+    };
+    // Update global config
+    CONFIG.facilityName    = d.settings.facilityName;
+    CONFIG.facilityAddress = d.settings.facilityAddress;
+    CONFIG.facilityPhone   = d.settings.facilityPhone;
+    CONFIG.facilityEmail   = d.settings.facilityEmail;
+  }); showToast('Settings saved!','success');
+}
+
+function exportData() {
+  const data = DB.get();
+  const blob  = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url   = URL.createObjectURL(blob);
+  const a     = document.createElement('a');
+  a.href=url; a.download='tali_medicals_backup_'+DB.today()+'.json';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('Data exported!','success');
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.json';
+  input.onchange = e => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        localStorage.setItem(DB._key, JSON.stringify(data));
+        showToast('Data imported! Refreshing...','success');
+        setTimeout(()=>location.reload(),1200);
+      } catch { showToast('Invalid JSON file','error'); }
+    };
+    reader.readAsText(e.target.files[0]);
+  };
+  input.click();
+}
+
+function clearAllData() {
+  if (!confirm('⚠️ This will delete ALL data permanently. Are you absolutely sure?\n\nType "DELETE" to confirm or click Cancel.')) return;
+  const confirm2 = prompt('Type DELETE to confirm:');
+  if (confirm2 !== 'DELETE') { showToast('Cancelled.'); return; }
+  localStorage.removeItem(DB._key);
+  showToast('All data cleared. Reloading...','success');
+  setTimeout(()=>location.reload(),1200);
+}
+
+/* ================================================================
+   UTILITY FUNCTIONS
+================================================================ */
+// ✏️ CUSTOMISE: Change currency symbol and formatting here
+function getCurrency()    { return '₦'; }  // ← Change to $, £, €, GHS, etc.
+function formatCurrency(n){ return getCurrency() + (parseFloat(n)||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+function el(id)  { return document.getElementById(id); }
+function val(id) { const e=el(id); return e?(e.value||'').trim():''; }
+function esc(s)  { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function filterTable(input, tbodyId) {
+  const q=input.value.toLowerCase();
+  el(tbodyId).querySelectorAll('tr').forEach(r=>{
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function deleteRecord(store, id, label) {
+  if (!confirm(`Delete this ${label}? This cannot be undone.`)) return;
+  DB.set(d=>{ if(!d[store])return; d[store]=d[store].filter(x=>x.id!==id); });
+  navigate(currentPage);
+  showToast(label+' deleted.','success');
+}
+
+/* ── MODAL ──────────────────────────────────────────────────── */
+function openModal(title, bodyOrSize, bodyOrBtns, btns) {
+  let size='', body='', buttons=[];
+  // Signature: openModal(title, body, btns) or openModal(title, 'modal-lg', body, btns)
+  if(typeof bodyOrSize==='string' && (bodyOrSize==='modal-lg'||bodyOrSize==='modal-sm')) {
+    size=bodyOrSize; body=bodyOrBtns; buttons=btns||[];
+  } else { body=bodyOrSize; buttons=bodyOrBtns||[]; }
+
+  const box = el('modal-box');
+  box.className = 'modal' + (size?' '+size:'');
+  el('modal-title').textContent = title;
+  el('modal-body').innerHTML = body;
+  el('modal-footer').innerHTML = `
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    ${buttons.map((b,i)=>`<button class="btn ${b.cls||'btn-primary'}" id="mf-btn-${i}">${b.label}</button>`).join('')}
+  `;
+  buttons.forEach((b,i)=>{ el('mf-btn-'+i).addEventListener('click',b.action); });
+  el('modal-overlay').classList.add('open');
+}
+
+function closeModal() { el('modal-overlay').classList.remove('open'); }
+function closeModalOnOverlay(e) { if(e.target===el('modal-overlay')) closeModal(); }
+
+/* ── TOAST ──────────────────────────────────────────────────── */
+let _toastTimer;
+function showToast(msg, type='') {
+  const t=el('toast');
+  t.textContent = (type==='success'?'✅ ':type==='error'?'❌ ':'')+ msg;
+  t.className = 'show' + (type?' toast-'+type:'');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+/* ── INIT ────────────────────────────────────────────────────── */
+window.onload = () => {
+  el('login-email').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  el('login-pass').addEventListener('keydown',  e=>{ if(e.key==='Enter') doLogin(); });
+};
 </script>
 </body>
 </html>
