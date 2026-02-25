@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCentre Enterprise X - Hospital Grade</title>
+
+<style>
+:root{
+--primary:#0f172a;
+--accent:#2563eb;
+--success:#16a34a;
+--danger:#dc2626;
+--warning:#d97706;
+--bg:#f1f5f9;
+--card:#ffffff;
+}
+*{box-sizing:border-box;}
+body{
+margin:0;
+font-family:Segoe UI, sans-serif;
+background:var(--bg);
+display:flex;
+height:100vh;
+}
+.sidebar{
+width:280px;
+background:var(--primary);
+color:white;
+padding:20px;
+overflow-y:auto;
+}
+.sidebar li{
+list-style:none;
+padding:10px;
+cursor:pointer;
+border-radius:6px;
+}
+.sidebar li:hover{background:#1e293b;}
+.main{
+flex:1;
+padding:20px;
+overflow-y:auto;
+}
+.card{
+background:var(--card);
+padding:20px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+button{
+padding:8px 14px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:var(--accent);
+color:white;
+}
+button.success{background:var(--success);}
+button.danger{background:var(--danger);}
+button.warning{background:var(--warning);}
+input,select,textarea{
+padding:8px;
+width:100%;
+margin:6px 0;
+}
+table{
+width:100%;
+border-collapse:collapse;
+}
+th,td{
+padding:8px;
+border-bottom:1px solid #ddd;
+text-align:left;
+}
+.badge{
+padding:4px 8px;
+border-radius:4px;
+font-size:12px;
+color:white;
+}
+.status-pending{background:var(--warning);}
+.status-complete{background:var(--success);}
+.status-active{background:var(--accent);}
+.low-stock{color:var(--danger);font-weight:bold;}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h2>🏥 MedCentre X</h2>
+<div id="roleDisplay"></div>
+<hr>
+<li onclick="Router.go('dashboard')">Dashboard</li>
+<li onclick="Router.go('patients')">Patients</li>
+<li onclick="Router.go('consultations')">Consultations</li>
+<li onclick="Router.go('laboratory')">Laboratory</li>
+<li onclick="Router.go('pharmacy')">Pharmacy</li>
+<li onclick="Router.go('billing')">Billing</li>
+<li onclick="Router.go('reports')">Reports</li>
+<li onclick="Router.go('audit')">Audit</li>
+</div>
+
+<div class="main">
+<h1 id="pageTitle">Dashboard</h1>
+<div id="app"></div>
+</div>
+
+<script>
+
+/* CONFIG */
+
+const CONFIG={
+MODE:"LOCAL",
+CONSULT_FEE:20
+};
+
+/* UTIL */
+
+const Util={
+id:()=>Date.now()+Math.random().toString(16).slice(2),
+now:()=>new Date().toISOString()
+};
+
+/* RBAC */
+
+const Auth={
+role:"Admin",
+can(module){
+const permissions={
+Admin:["*"],
+Doctor:["dashboard","patients","consultations"],
+Lab:["laboratory"],
+Pharmacy:["pharmacy"],
+Reception:["patients","billing"]
+};
+return permissions[this.role].includes("*") ||
+permissions[this.role].includes(module);
+}
+};
+
+/* DATA */
+
+class DataProvider{
+static load(){
+return {
+patients:JSON.parse(localStorage.getItem("patients"))||[],
+consultations:JSON.parse(localStorage.getItem("consultations"))||[],
+labs:JSON.parse(localStorage.getItem("labs"))||[],
+pharmacy:JSON.parse(localStorage.getItem("pharmacy"))||[],
+billing:JSON.parse(localStorage.getItem("billing"))||[],
+audit:JSON.parse(localStorage.getItem("audit"))||[]
+};
+}
+static save(data){
+Object.keys(data).forEach(k=>localStorage.setItem(k,JSON.stringify(data[k])));
+}
+}
+
+/* STATE */
+
+const State={
+data:null,
+init(){this.data=DataProvider.load();},
+save(){DataProvider.save(this.data);},
+log(action){
+this.data.audit.push({id:Util.id(),action,time:Util.now()});
+}
+};
+
+/* ROUTER */
+
+const Router={
+go(page){
+if(!Auth.can(page)){
+alert("Access Denied");
+return;
+}
+document.getElementById("pageTitle").innerText=page;
+document.getElementById("app").innerHTML=Modules[page]();
+}
+};
+
+/* MODULES */
+
+const Modules={
+
+dashboard:()=>`
+<div class="card">
+<h3>Total Patients</h3>
+<h2>${State.data.patients.length}</h2>
+</div>
+<div class="card">
+<h3>Total Revenue</h3>
+<h2>$${State.data.billing.reduce((a,b)=>a+Number(b.amount||0),0)}</h2>
+</div>
+`,
+
+patients:()=>`
+<div class="card">
+<input id="p_name" placeholder="Name">
+<input id="p_dob" type="date">
+<input id="p_phone" placeholder="Phone">
+<button onclick="addPatient()">Register</button>
+</div>
+<div class="card">
+${State.data.patients.map(p=>`
+<p><strong>${p.name}</strong> | ${p.phone}</p>
+`).join("")}
+</div>
+`,
+
+consultations:()=>`
+<div class="card">
+<input id="c_patient" placeholder="Patient">
+<textarea id="c_note" placeholder="SOAP Note"></textarea>
+<button onclick="saveConsult()">Save & Bill</button>
+</div>
+`,
+
+laboratory:()=>`
+<div class="card">
+<input id="lab_patient" placeholder="Patient">
+<input id="lab_test" placeholder="Test">
+<input id="lab_fee" type="number" placeholder="Fee">
+<button onclick="orderLab()">Order Lab</button>
+</div>
+`,
+
+pharmacy:()=>`
+<div class="card">
+<input id="drug_name" placeholder="Drug">
+<input id="drug_stock" type="number" placeholder="Stock">
+<input id="drug_price" type="number" placeholder="Unit Price">
+<button onclick="addDrug()">Add Drug</button>
+</div>
+<div class="card">
+${State.data.pharmacy.map(d=>`
+<p>${d.name} | Stock: <span class="${d.stock<5?'low-stock':''}">
+${d.stock}</span></p>
+`).join("")}
+</div>
+`,
+
+billing:()=>`
+<div class="card">
+${State.data.billing.map(b=>`
+<p>${b.patient} | $${b.amount}</p>
+`).join("")}
+</div>
+`,
+
+reports:()=>`
+<div class="card">
+<p>Consultations: ${State.data.consultations.length}</p>
+<p>Lab Orders: ${State.data.labs.length}</p>
+<p>Revenue: $${State.data.billing.reduce((a,b)=>a+Number(b.amount||0),0)}</p>
+</div>
+`,
+
+audit:()=>`
+<div class="card">
+${State.data.audit.map(a=>`
+<p>${a.action} - ${a.time}</p>
+`).join("")}
+</div>
+`
+};
+
+/* OPERATIONS */
+
+function addPatient(){
+State.data.patients.push({
+id:Util.id(),
+name:p_name.value,
+dob:p_dob.value,
+phone:p_phone.value
+});
+State.log("Patient Registered");
+State.save();
+Router.go("patients");
+}
+
+function saveConsult(){
+State.data.consultations.push({
+id:Util.id(),
+patient:c_patient.value,
+note:c_note.value,
+time:Util.now()
+});
+State.data.billing.push({
+id:Util.id(),
+patient:c_patient.value,
+amount:CONFIG.CONSULT_FEE
+});
+State.log("Consultation + Auto Billing");
+State.save();
+Router.go("dashboard");
+}
+
+function orderLab(){
+State.data.labs.push({
+id:Util.id(),
+patient:lab_patient.value,
+test:lab_test.value,
+fee:lab_fee.value,
+status:"pending"
+});
+State.data.billing.push({
+id:Util.id(),
+patient:lab_patient.value,
+amount:lab_fee.value
+});
+State.log("Lab Ordered + Auto Billing");
+State.save();
+Router.go("dashboard");
+}
+
+function addDrug(){
+State.data.pharmacy.push({
+id:Util.id(),
+name:drug_name.value,
+stock:Number(drug_stock.value),
+price:Number(drug_price.value)
+});
+State.log("Drug Added");
+State.save();
+Router.go("pharmacy");
+}
+
+/* INIT */
+
+State.init();
+document.getElementById("roleDisplay").innerText="Role: "+Auth.role;
+Router.go("dashboard");
+
+</script>
+</body>
+</html>
